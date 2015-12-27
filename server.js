@@ -13,6 +13,7 @@
 
 	var mime_types = {
 		".txt": {"Content-Type": "text/plain", "Content-Encoding": "charset=utf-8"},
+		".htm": {"Content-Type": "text/html", "Content-Encoding": "charset=utf-8"},
 		".html": {"Content-Type": "text/html", "Content-Encoding": "charset=utf-8"},
 		".js": {"Content-Type": "text/javascript", "Content-Encoding": "charset=utf-8"},
 		".css": {"Content-Type": "text/css", "Content-Encoding": "charset=utf-8"},
