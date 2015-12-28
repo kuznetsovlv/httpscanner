@@ -3,6 +3,22 @@
 <head>
 	<title>Scanner</title>
 	<script src='js/scanner.js'></script>
+	<script type="text/javascript">
+		(function () {
+			"use strict";
+
+			window.onload = function () {
+				var scanner = new Scanner();
+				scanner.ask('list', function (list) {
+					console.log(list);
+					this.ask('scan', function (data) {
+						console.log(data.length);
+						console.log(data);
+					});
+				});
+			}
+		})()
+	</script>
 </head>
 <body>
 <h1>It works!</h1>
