@@ -11,9 +11,14 @@
 				var scanner = new Scanner();
 				scanner.ask('list', function (list) {
 					console.log(list);
-					this.ask('scan', function (data) {
+					this.ask('scan', {'device-name': 'epkowa:usb:002:010', format: 'tiff'}, function (data) {
 						console.log(data.length);
 						console.log(data);
+
+						var img = document.createElement('img');
+
+						img.setAttribute('src', data);
+						document.body.appendChild(img);
 					});
 				});
 			}

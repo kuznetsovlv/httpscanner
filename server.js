@@ -17,7 +17,10 @@
 
 	var jobs = {};
 
-	
+	function sendError (response, code, msg) {
+		set_status(response, code || 404, msg);
+		response.end();
+	} 
 
 	function sendFile (response, fd, pos) {
 		var size = 1024;
@@ -25,7 +28,7 @@
 			if (err)
 				response.end();
 			else
-				response.write(buffer.toString('utf8', 0, bytesRead), 'utf8', function () {
+				response.write(buffer/*.toString('utf8', 0, bytesRead), 'utf8'*/, function () {
 					if (bytesRead < size) 
 						response.end();
 					else
@@ -33,11 +36,6 @@
 				});
 		});
 	}
-
-	function sendError (response, code, msg) {
-		set_status(response, code || 404, msg);
-		response.end();
-	} 
 
 	function urlToFile (response, url) {
 		fs.stat(url, function (err, stats) {
@@ -49,7 +47,9 @@
 				set_mime(response, path.extname(url));
 				fs.open(url, 'r', function (err, fd) {
 					if (err)
-								throw err;
+						sendError(response, 520, err.Error);
+					response.setHeader('Content-length', stats.size);
+					response.setHeader('Last-Modified', stats.mtime.toUTCString());
 					sendFile(response, fd, 0);
 				});
 			} else if (stats.isDirectory()) {
@@ -60,14 +60,20 @@
 		});
 	}
 
-	function json2opts (json) {
+	function obj2opts (obj) {
 		var opts = [];
-		for (var key in json) {
+		for (var key in obj) {
 			if (key === 'cmd')
 				continue;
-			var opt = [key.length > 1 ? '--' : '-', key].join('');
-			if (json[key])
-				opt = [opt, json[key]].join(' ');
+			var d = ' ',
+			    p = '-';
+			if(key.length > 1) {
+				p = '--',
+				d = '=';
+			}
+			var opt = [ p, key].join('');
+			if (obj[key])
+				opt = [opt, obj[key]].join(d);
 			opts.push(opt);
 		}
 		return opts;
@@ -99,21 +105,87 @@
 			set_mime(response, 'json');
 			response.end(JSON.stringify(list));
 		});
+		scan.stderr.on('data', function () {sendError(response, 520);});
+	}
+
+	function drawPath (p, checked, callback) {
+		if (p === checked){
+			callback();
+		} else {
+			var dir = p,
+			    tmp;
+			while ((tmp = path.dirname(dir)) && tmp !== checked)
+				dir = tmp;
+			fs.stat(dir, function (err, stats) {
+				if (err) {
+					if (err.code === 'ENOENT') {
+						fs.mkdir(dir, function (err) {
+							if (err)
+								sendError(response, 520, err.Error);
+							else
+								drawPath(p, dir, callback);
+						});
+					} else {
+						sendError(response, 520, err.Error);
+					}
+				} else if (!stats.isDirectory()) {
+					sendError(response, 520, dir + ' must be a dirrectory');
+				} else {
+					drawPath(p, dir, callback);
+				}
+			});
+		}
+	}
+
+	function scanImage (response, data, device) {
+		var format = data.format,
+		    devPath = path.join('scans', device),
+		    imgPath = path.join(devPath, ['img', format].join('.')),
+		    fd = 0;
+		jobs[device] = imgPath;
+
+		response.on('finish', function () {
+			delete jobs[device];
+		});
+
+		response.on('close', function () {
+			delete jobs[device];
+		});
+
+		drawPath(path.join(__dirname, devPath), __dirname, function () {
+			var scan = scanner(obj2opts(data));
+
+			scan.stdout.on('data', function (data) {
+				var buffer = new Buffer(data);
+				if (!fd) {
+					try {
+						fd = fs.openSync(imgPath, 'w');
+					} catch (err) {
+						sendError(response, 520, err.Error);
+					}
+				}
+				try {
+					fs.writeSync(fd, buffer, 0, buffer.length);
+				} catch (err) {
+					sendError(response, 520, err.Error);
+				}
+
+			});
+			scan.stdout.on('end', function () {
+				fs.close(fd, function () {
+					set_status(response, 200);
+					set_mime(response, 'txt');
+					response.end(imgPath);
+				});
+			});
+
+			scan.stderr.on('data', function (data) {sendError(response, 520, data);});
+		});
 	}
 
 	var server = new http.Server();
 
-	server.on('close', function () {console.log(arguments)});
-
 	server.on('request', function (request, response) {
-		/*response.on('finish', function () {
-			console.log('Finished');
-			console.log(arguments);
-		});
-		response.on('close', function () {
-			console.log('Closed');
-			console.log(arguments);
-		});*/
 		switch (request.method) {
 			case 'GET': urlToFile(response, path.join(__dirname, request.url)); break;
 			case 'POST':
@@ -135,27 +207,14 @@
 						case 'free':
 						case 'list': sendDeviceList(response, cmd === 'free'); break;
 						case 'scan':
+								if (jobs[device])
+									sendError(response, 409, 'Device busy');
+								else
+									scanImage(response, data, device);
+								break;
 						case 'stop':
 						default: sendError(response, 405, 'Unknown command');
 					}
-					/*var params = [],
-					    type = ['.', data['--format'] || 'png'].join('');
-					for (var key in data) {
-						params.push(data[key] ? [key, data[key]].join(' ') : key);
-
-					}
-					var result = scanner(params);
-					response.statusCode = null;
-					result.stdout.on('data', function (data) {
-						if (!response.statusCode) {
-							response.statusCode = 200;
-							response.statusMessage = 'OK';
-							set_mime(response, type);
-						}
-						response.write(data);
-					});
-					result.stdout.on('end', function () {response.end();});
-					result.stderr.on('data', function (data) {sendError(response, 500);});*/
 				});
 				break;
 		}

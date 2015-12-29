@@ -17,7 +17,7 @@
 	 	request.setRequestHeader("Content-Type", "application/json");
 	 	request.onreadystatechange = function () {
 	 		if (request.readyState == 4 && request.status == 200){
-	 			var result = JSON.parse(request.responseText);
+	 			var result = request.getResponseHeader("Content-Type") === 'application/json' ? JSON.parse(request.responseText) : request.responseText;
 	 			callback.call(self, result);
 	 		}
 	 	};
