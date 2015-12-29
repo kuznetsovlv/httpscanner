@@ -13,7 +13,9 @@
 
 	var options = {
 		defaultFile: 'index.html'
-	}
+	};
+
+	var jobs = {};
 
 	
 
@@ -58,9 +60,60 @@
 		});
 	}
 
+	function json2opts (json) {
+		var opts = [];
+		for (var key in json) {
+			if (key === 'cmd')
+				continue;
+			var opt = [key.length > 1 ? '--' : '-', key].join('');
+			if (json[key])
+				opt = [opt, json[key]].join(' ');
+			opts.push(opt);
+		}
+		return opts;
+	}
+
+	function sendDeviceList (response, free) {
+		var data = '';
+		var scan = scanner(['-f %i\t%d\t%v\t%m\t%n']);
+
+		scan.stdout.on('data', function (chunk) {data += chunk;});
+		scan.stdout.on('end', function () {
+			data = data.split('\n');
+			var list = [];
+			for (var i = 0, l = data.length; i < l; ++i) {
+				var raw = data[i];
+				if (!raw)
+					continue;
+				raw = raw.trim().split('\t');
+				list.push({
+					i: +raw[0],
+					name: raw[1],
+					description: [raw[2], raw[3]].join(' ')
+				});
+			}
+			list.sort(function (a, b) {return a.i - b.i});
+			if (free)
+				list = list.filter(function (a, i, arr) {return !jobs[a.name];});
+			set_status(response, 200);
+			set_mime(response, 'json');
+			response.end(JSON.stringify(list));
+		});
+	}
+
 	var server = new http.Server();
 
+	server.on('close', function () {console.log(arguments)});
+
 	server.on('request', function (request, response) {
+		/*response.on('finish', function () {
+			console.log('Finished');
+			console.log(arguments);
+		});
+		response.on('close', function () {
+			console.log('Closed');
+			console.log(arguments);
+		});*/
 		switch (request.method) {
 			case 'GET': urlToFile(response, path.join(__dirname, request.url)); break;
 			case 'POST':
@@ -70,8 +123,22 @@
 					data = data.join('');
 					if (!request.headers['content-type'] === 'application/json')
 						sendError(response, 400, 'Content must be application/json');
-					data = JSON.parse(data);
-					var params = [],
+					try {
+						data = JSON.parse(data);
+					} catch (e) {
+						sendError(response, 400, 'Wrong JSON');
+					}
+
+					var cmd = data.cmd,
+					    device = data['device-name'];
+					switch (cmd) {
+						case 'free':
+						case 'list': sendDeviceList(response, cmd === 'free'); break;
+						case 'scan':
+						case 'stop':
+						default: sendError(response, 405, 'Unknown command');
+					}
+					/*var params = [],
 					    type = ['.', data['--format'] || 'png'].join('');
 					for (var key in data) {
 						params.push(data[key] ? [key, data[key]].join(' ') : key);
@@ -88,7 +155,7 @@
 						response.write(data);
 					});
 					result.stdout.on('end', function () {response.end();});
-					result.stderr.on('data', function (data) {sendError(response, 500);});
+					result.stderr.on('data', function (data) {sendError(response, 500);});*/
 				});
 				break;
 		}
