@@ -6,8 +6,9 @@
 	var fs = require('fs');
 	var path = require('path');
 	var Buffer = require('buffer').Buffer;
+	var spawn = require('child_process').spawn;
 
-	var scanner = require('./lib/scanner.js');
+
 	var set_status = require('./lib/status.js');
 	var set_mime = require('./lib/mime.js')
 
@@ -16,6 +17,19 @@
 	};
 
 	var jobs = {};
+
+	 function scanner (args, options) {
+		return spawn('scanimage', args, options);
+	}
+
+	function converter (format, args, options) {
+		switch (format.toLowerCase()) {
+			case 'jpg':
+			case 'jpeg': return spawn('pnmtojpeg', args, options);
+			case 'png': return spawn('pnmtopng', args, options);
+			default: return undefined;
+		}
+	}
 
 	function sendError (response, code, msg) {
 		set_status(response, code || 404, msg);
@@ -63,7 +77,7 @@
 	function obj2opts (obj) {
 		var opts = [];
 		for (var key in obj) {
-			if (key === 'cmd')
+			if ({cmd: 1, format: 1}[key])
 				continue;
 			var d = ' ',
 			    p = '-';
@@ -138,7 +152,7 @@
 	}
 
 	function scanImage (response, data, device) {
-		var format = data.format,
+		var format = data.conv.format,
 		    devPath = path.join('scans', device),
 		    imgPath = path.join(devPath, ['img', format].join('.')),
 		    fd = 0;
@@ -153,9 +167,22 @@
 		});
 
 		drawPath(path.join(__dirname, devPath), __dirname, function () {
-			var scan = scanner(obj2opts(data));
+			var args = obj2opts(data.scanner);
+			args.push('--format=pnm')
+			var scan = scanner(args);
+			var conv = converter(format, obj2opts(data.conv.opts));
 
 			scan.stdout.on('data', function (data) {
+				conv.stdin.write(data);
+			});
+			scan.on('close', function (code) {
+				if (code)
+					sendError(response, 503, 'Scanner not ready');
+				conv.stdin.end();
+
+			});
+
+			conv.stdout.on('data', function (data) {
 				var buffer = new Buffer(data);
 				if (!fd) {
 					try {
@@ -171,8 +198,10 @@
 				}
 
 			});
-			scan.stdout.on('end', function () {
+			conv.on('close', function (code) {
 				fs.close(fd, function () {
+					if (code)
+						sendError(response, 520);
 					set_status(response, 200);
 					set_mime(response, 'txt');
 					response.end(imgPath);
@@ -202,7 +231,7 @@
 					}
 
 					var cmd = data.cmd,
-					    device = data['device-name'];
+					    device = data.scanner ? data.scanner['device-name'] : null;
 					switch (cmd) {
 						case 'free':
 						case 'list': sendDeviceList(response, cmd === 'free'); break;

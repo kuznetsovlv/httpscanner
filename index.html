@@ -11,7 +11,18 @@
 				var scanner = new Scanner();
 				scanner.ask('list', function (list) {
 					console.log(list);
-					this.ask('scan', {'device-name': 'epkowa:usb:002:010', format: 'tiff'}, function (data) {
+					this.ask('scan', {
+						scanner: {
+							'device-name': list[0].name
+						},
+						conv: {
+							format: 'jpg',
+							opts: {
+								quality: 100,
+								progressive: ''
+							}
+						}
+					},function (data) {
 						console.log(data.length);
 						console.log(data);
 
