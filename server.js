@@ -8,7 +8,6 @@
 	var Buffer = require('buffer').Buffer;
 	var spawn = require('child_process').spawn;
 
-
 	var set_status = require('./lib/status.js');
 	var set_mime = require('./lib/mime.js')
 
@@ -42,7 +41,7 @@
 			if (err)
 				response.end();
 			else
-				response.write(buffer/*.toString('utf8', 0, bytesRead), 'utf8'*/, function () {
+				response.write(buffer, function () {
 					if (bytesRead < size) 
 						response.end();
 					else
