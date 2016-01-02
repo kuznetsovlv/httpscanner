@@ -4,6 +4,10 @@
 	<title>Scanner</title>
 	<style type="text/css">
 
+		.hidden {
+			display: none;
+		}
+
 		body {
 			position: absolute;
 			width: 100%;
@@ -17,6 +21,7 @@
 		#page {
 			width: 800px;
 			height: 100%;
+			min-height: 300px;
 			margin-left: auto;
 			margin-right: auto;
 			padding: 0px;
@@ -37,6 +42,23 @@
 		#right {float: right;}
 		#left {float: left;}
 
+		form fieldset {
+			margin-top: 10px;
+		}
+
+		form fieldset p {
+			padding-left: 50px;
+		}
+
+		span+span {
+			margin: 5px;
+		}
+
+		#submit_button {
+			border: none;
+			/*text-align: center;*/
+		}
+
 	</style>
 	<script src='js/scanner.js'></script>
 	<script type="text/javascript">
@@ -53,8 +75,27 @@
 <div id="page">
 	<div id="left"></div>
 	<div id="right">
-		<form id="scanner"></form>
+		<form id="scanner" oninput="qval.value=parseInt(quality.value)">
+			<fieldset id="device_name">
+				<legend>Device:</legend>
+				<p><span>Get scan from device:</span><span><select name="device_name" disabled><option value="">--Select device--</option></select></span></p>
+			</fieldset>
+
+			<fieldset id="image_property">
+				<legend>Image property:</legend>
+				<p><span>Image format:</span><span><select name="format" disabled><option value="">--Select format--</option></select></span></p>
+				<p class="jpeg hidden">
+					<span>Quality value:</span>
+					<span>0<input name="quality" type="range" value="50" disabled>100 <output name="qval" for="quality"/></span>
+				</p>
+			</fieldset>
+
+			<fieldset id="submit_button">
+				<input type="submit" value="Scan" disabled> <input type="button" value="Prescan" disabled>
+			</fieldset>
+		</form>
 	</div>
 </div>
+
 </body>
 </html>
