@@ -175,7 +175,7 @@
 								case 'button': self.emit('button', name, self.values); break;
 							}
 							break;
-						case 'change': self.emit('change', self.values, element.value); break;
+						case 'change': self.emit('change', name, self.values, element.value); break;
 						case 'submit': self.emit('save', self.values); break;
 						case 'reset': self.emit('reset'); break;
 						default: self.emit(type, name, self.values, element);
