@@ -164,12 +164,13 @@
 		for (var i = 0, l = eventMap.length; i < l; ++i) {
 			var type = eventMap[i];
 			(function () {
-				setListener(form, type, function (event) {
+				var t = type;
+				setListener(form, t, function (event) {
 					var target = event.target,
 					    name = target.getAttribute('name'),
 					    element = target['data-cover'],
 					    e_type = element.type;
-					switch (type) {
+					switch (t) {
 						case 'click':
 							switch (e_type) {
 								case 'button': self.emit('button', name, self.values); break;
@@ -178,10 +179,8 @@
 						case 'change': self.emit('change', name, self.values, element.value); break;
 						case 'submit': self.emit('save', self.values); break;
 						case 'reset': self.emit('reset'); break;
-						default: self.emit(type, name, self.values, element);
+						default: self.emit(t, name, self.values, element);
 					}
-
-					self.emit(type, event);
 					if (event.PreventDefault)
 						event.PreventDefault();
 					if (event.returnValue)
