@@ -63,20 +63,21 @@
 
 	function Select (e) {
 		Element.call(this, e);
-	}
 
-	Select.prototype.setOptions = function setOptions (opts) {
-		var children = this.e.children;
-		while (children.length)
-			this.e.removeChild(children[0]);
+		this.setOptions = function setOptions (opts) {
+			var children = this.e.children;
+			while (children.length)
+				this.e.removeChild(children[0]);
 
-		for (var key in opts) {
-			var option = document.createElement('option');
-			option.setAttribute('value', key);
-			option.appendChild(document.createTextNode(opts[key]));
-			this.e.appendChild(option);
+			for (var key in opts) {
+				var option = document.createElement('option');
+				option.setAttribute('value', key);
+				option.appendChild(document.createTextNode(opts[key]));
+				this.e.appendChild(option);
+			}
 		}
 	}
+
 
 	function Input (e) {
 		Element.call(this, e);
