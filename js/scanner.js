@@ -11,8 +11,58 @@
 		}
 	}
 
-	function Input (e) {
+	function EventEmmtter () {
+		this.events = {};
+		this.onceEvents = {};
+	}
+
+	EventEmmtter.prototype.on = function on (type, handler) {
+		if (this.events[type])
+			this.events[type].push(handler);
+		else
+			this.events[type] = [handler];
+		return this;
+	};
+
+	EventEmmtter.prototype.once = function once (type, handler) {
+		if (this.onceEvents[type])
+			this.onceEvents[type].push(handler);
+		else
+			this.onceEvents[type] = [handler];
+		return this;
+	};
+
+	EventEmmtter.prototype.emit = function emit (type) {
+		var listeners = this.onceEvents[type],
+		    args = [];
+
+		for (var i = 1, l = arguments.length; i < l; ++i)
+			args.push(arguments[i]);
+
+		if (listeners)
+			while(listeners.length)
+				listeners.shift().apply(this, args);
+
+		listeners = this.events[type];
+		if (listeners)
+			for (var i = 0, l = listeners.length; i < l; ++i)
+				listeners[i].apply(this, args);
+
+		return this;
+	}
+
+	function Element (e) {
+
+		EventEmmtter.call(this);
+
 		this.e = e;
+		this.tag = e.tagName.toLowerCase();
+	}
+
+	function Input (e) {
+
+		Element.call(this, e);
+
 		Object.defineProperties(this, {
 			'value': {
 				get: function () {return this.e.disabled ? undefined : this.e.value},
@@ -30,13 +80,17 @@
 		});
 	}
 
-
 	function Scanner (id) {
+
 		var form = document.getElementById(id);
 		if (form.tagName!== 'FORM')
 			form = form.getElementsByTagName('form')[0];
 		if (!form)
 			throw "Wrong form element";
+
+		Element.call(this, form);
+
+		var self = this;
 		setListener(form, 'submit', function (event) {
 
 			if (event.PreventDefault)
