@@ -203,9 +203,14 @@
 		request.open("POST", "");
 		request.setRequestHeader("Content-Type", "application/json");
 		request.onreadystatechange = function () {
-			if (request.readyState == 4 && request.status == 200){
-				var result = request.getResponseHeader("Content-Type") === 'application/json' ? JSON.parse(request.responseText) : request.responseText;
-				callback.call(self, result);
+			if (request.readyState == 4){
+				var status = request.status;
+				if (status >= 200 && status < 300) {
+					var result = request.getResponseHeader("Content-Type") === 'application/json' ? JSON.parse(request.responseText) : request.responseText;
+					callback.call(self, result);
+				} else {
+					alert(['ERROR', status, '\n', request.statusMassage].join(''));
+				}
 			}
 		};
 		request.send(JSON.stringify(params));
