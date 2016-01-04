@@ -80,6 +80,10 @@
 						}
 						this.device_name.setOptions(opts);
 						this.device_name.enabled = true;
+
+						this.on('change', function (name, values, value) {
+							console.log(arguments);
+						});
 					}
 				});
 			};
