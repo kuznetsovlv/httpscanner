@@ -79,15 +79,20 @@
 						}
 						this.device_name.setOptions(opts);
 						this.device_name.enabled = true;
-
-						/*this.on('change', function (name, values, value) {
-							console.log(arguments);
-						});*/
 					}
 				});
 
 				scanner.on('change', function (name, values, value) {
-					console.log(arguments);
+					switch (name) {
+						case 'device_name':
+							this.format.setOptions({
+								'': '--Select format--',
+								'jpg': 'jpg',
+								'jpeg': 'jpeg',
+								'png': 'png'
+							});
+							break;
+					}
 				});
 
 			};
