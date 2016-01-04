@@ -72,7 +72,15 @@
 					if (!list.length) {
 						alert("No scanners found.");
 					} else {
+						var opts = {'': '--Select device--'};
+						for (var i = 0, l = list.length; i < l; ++i) {
+							var obj = list[i],
+							    name = obj.name;
+							opts[name] = [obj.description, ['(', name, ')'].join('')].join(' ');
+							this.device_name.setOptions(opts);
+							this.device_name.enabled = true;
 
+						}
 					}
 				});
 			};
