@@ -68,7 +68,6 @@
 			window.onload = function () {
 				var scanner = new Scanner('scanner');
 				scanner.ask('list', function (list) {
-					console.log(list);
 					if (!list.length) {
 						alert("No scanners found.");
 					} else {
@@ -81,11 +80,16 @@
 						this.device_name.setOptions(opts);
 						this.device_name.enabled = true;
 
-						this.on('change', function (name, values, value) {
+						/*this.on('change', function (name, values, value) {
 							console.log(arguments);
-						});
+						});*/
 					}
 				});
+
+				scanner.on('change', function (name, values, value) {
+					console.log(arguments);
+				});
+
 			};
 		})()
 	</script>
