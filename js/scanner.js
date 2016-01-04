@@ -14,41 +14,41 @@
 	function EventEmmtter () {
 		this.events = {};
 		this.onceEvents = {};
-	}
 
-	EventEmmtter.prototype.on = function on (type, handler) {
-		if (this.events[type])
-			this.events[type].push(handler);
-		else
-			this.events[type] = [handler];
-		return this;
-	};
+		this.on = function on (type, handler) {
+			if (this.events[type])
+				this.events[type].push(handler);
+			else
+				this.events[type] = [handler];
+			return this;
+		};
 
-	EventEmmtter.prototype.once = function once (type, handler) {
-		if (this.onceEvents[type])
-			this.onceEvents[type].push(handler);
-		else
-			this.onceEvents[type] = [handler];
-		return this;
-	};
+		this.once = function once (type, handler) {
+			if (this.onceEvents[type])
+				this.onceEvents[type].push(handler);
+			else
+				this.onceEvents[type] = [handler];
+			return this;
+		};
 
-	EventEmmtter.prototype.emit = function emit (type) {
-		var listeners = this.onceEvents[type],
-		    args = [];
+		this.emit = function emit (type) {
+			var listeners = this.onceEvents[type],
+			    args = [];
+	
+			for (var i = 1, l = arguments.length; i < l; ++i)
+				args.push(arguments[i]);
 
-		for (var i = 1, l = arguments.length; i < l; ++i)
-			args.push(arguments[i]);
+			if (listeners)
+				while(listeners.length)
+					listeners.shift().apply(this, args);
 
-		if (listeners)
-			while(listeners.length)
-				listeners.shift().apply(this, args);
+			listeners = this.events[type];
+			if (listeners)
+				for (var i = 0, l = listeners.length; i < l; ++i)
+					listeners[i].apply(this, args);
 
-		listeners = this.events[type];
-		if (listeners)
-			for (var i = 0, l = listeners.length; i < l; ++i)
-				listeners[i].apply(this, args);
-
-		return this;
+			return this;
+		}
 	}
 
 	function Element (e) {
@@ -57,11 +57,37 @@
 
 		this.e = e;
 		this.tag = e.tagName.toLowerCase();
+		e['data-cover'] = this;
+
+	}
+
+	function Select (e) {
+		Element.call(this, e);
+	}
+
+	Select.prototype.setOptions = function setOptions (opts) {
+		var children = this.e.children;
+		while (children.length)
+			this.e.removeChild(children[0]);
+
+		for (var key in opts) {
+			var option = document.createElement('option');
+			option.setAttribute('value', key);
+			option.appendChild(document.createTextNode(opts[key]));
+			this.e.appendChild(option);
+		}
 	}
 
 	function Input (e) {
-
 		Element.call(this, e);
+	}
+
+	function Field (e) {
+		switch (e.tagName) {
+			case 'SELECT': Select.call(this, e); break;
+			case 'INPUT':
+			default: Input.call(this, e); break;
+		}
 
 		Object.defineProperties(this, {
 			'value': {
@@ -74,11 +100,13 @@
 			},
 			'type': {
 				get: function () {
-						return this.e.getAttribute('type') || this.e.tagName.toLowerCase();
+						return this.e.getAttribute('type') || this.tag;
 				}
 			}
 		});
 	}
+
+
 
 	function Scanner (id) {
 
@@ -90,46 +118,77 @@
 
 		Element.call(this, form);
 
-		var self = this;
-		setListener(form, 'submit', function (event) {
-
-			if (event.PreventDefault)
-				event.PreventDefault();
-			if (event.returnValue)
-				event.returnValue = false;
-			return false;
-		});
 		for (var i = 0, l = form.length; i < l; ++i) {
 			var e = form[i];
+			this.buttons = {};
 			if ( !{FIELDSET: 1, OUTPUT: 1}[e.tagName]) {
 				var name = e.getAttribute('name');
-				if (this.name)
+				var field = new Field(e);
+				var dest;
+				switch (field.type) {
+					case 'button':
+					case 'submit': dest = this.buttons; break;
+					default: dest = this;
+				}
+				if (dest.name)
 					throw ["Duplicated or incorrect name", name, "found"].join(' ');
-				this[name] = new Input(e);
+				dest[name] = field;
 			}
 		}
 		Object.defineProperty(this, 'values', {
 			get: function () {
 				var v = {};
 				for (var key in this) {
-					var input = this[key];
-					if (input.constructor !== Input || {submit: 1, button: 1}[input.type] || !input.enabled)
+					var field = this[key];
+					if (field.constructor !== Field || !field.enabled)
 						continue;
-					v[key] = input.value;
+					v[key] = field.value;
 				}
 				return v;
 			},
 			set: function (v) {
 				if (typeof v === 'object') {
 					for (var key in v) {
-						var input = this[key];
-						if (!input || !('value' in input))
+						var field = this[key];
+						if (!field || !('value' in field))
 							continue;
-						input.value = v[key];
+						field.value = v[key];
 					}
 				}
 			}
-		})
+		});
+
+		var self = this;
+		var eventMap = 'change,submit,reset,click'.split(',');
+		for (var i = 0, l = eventMap.length; i < l; ++i) {
+			var type = eventMap[i];
+			(function () {
+				setListener(form, type, function (event) {
+					var target = event.target,
+					    name = target.getAttribute('name'),
+					    element = target['data-cover'],
+					    e_type = element.type;
+					switch (type) {
+						case 'click':
+							switch (e_type) {
+								case 'button': self.emit('button', name, self.values); break;
+							}
+							break;
+						case 'change': self.emit('change', self.values, element.value); break;
+						case 'submit': self.emit('save', self.values); break;
+						case 'reset': self.emit('reset'); break;
+						default: self.emit(type, name, self.values, element);
+					}
+
+					self.emit(type, event);
+					if (event.PreventDefault)
+						event.PreventDefault();
+					if (event.returnValue)
+						event.returnValue = false;
+					return false;
+				});
+			})();
+		}
 	}
 
 	Scanner.prototype.ask = function (cmd, params, callback) {
