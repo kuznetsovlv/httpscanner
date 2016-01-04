@@ -77,10 +77,9 @@
 							var obj = list[i],
 							    name = obj.name;
 							opts[name] = [obj.description, ['(', name, ')'].join('')].join(' ');
-							this.device_name.setOptions(opts);
-							this.device_name.enabled = true;
-
 						}
+						this.device_name.setOptions(opts);
+						this.device_name.enabled = true;
 					}
 				});
 			};
