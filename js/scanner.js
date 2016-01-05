@@ -284,8 +284,7 @@
 			if (request.readyState == 4){
 				var status = request.status;
 				if (status >= 200 && status < 300) {
-					var result = request.getResponseHeader("Content-Type") === 'application/json' ? JSON.parse(request.responseText) : request.responseText;
-					callback.call(self, result);
+					callback.call(self, request.getResponseHeader("Content-Type") === 'application/json' ? JSON.parse(request.responseText) : request.responseText);
 				} else {
 					alert(['ERROR', status, '\n', request.statusMassage].join(''));
 				}
