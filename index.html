@@ -103,6 +103,20 @@
 				return true;
 			}
 
+			function convertValues (values) {
+				var res = {
+					scanner: {
+						'device-name': values.device_name
+					},
+					conv: {
+						format: values.format
+					}
+				}
+				if ('quality' in values)
+					res.conv.opts = {quality: values.quality};
+				return res;
+			}
+
 			window.onload = function () {
 				var scanner = new Scanner('scanner');
 				scanner.ask('list', function (list) {this.qval.bound(function (a) {return a;});
@@ -143,6 +157,19 @@
 					for (var key in buttons)
 						buttons[key].enabled = enableButtons;
 
+				});
+
+				scanner.on('button', function (button, values) {
+					if (button === 'prescan')
+						this.scan({
+							device_name: values.device_name,
+							format: 'jpg',
+							quality: 0
+						});
+				});
+
+				scanner.on('scan', function (values) {
+					console.log(values, convertValues(values));
 				});
 				console.log(scanner);
 
