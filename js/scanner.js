@@ -83,9 +83,42 @@
 		Element.call(this, e);
 	}
 
+	function Output (e) {
+		Element.call(this, e);
+
+		var list = e.getAttribute('for').split(' '),
+		    form = e.form;
+		this.inputs = [];
+
+		for (var i = 0, l = list.length; i < l; ++i) {
+			var name = list[i];
+			for (var j = 0, f = form.length; j < f; ++j) {
+				if (form[j].getAttribute('name') === name) {
+					this.inputs.push(form[j]);
+					break;
+				}
+			}
+		}
+
+		this.bound = function bound (func) {
+			function _getVals (arr) {
+				var vals = [];
+				for (var i = 0, l = arr.length; i < l; ++i)
+					vals.push(parseInt(arr[i].value));
+				return vals;
+			}
+			this.e.value = func.apply(this, _getVals(this.inputs));
+			var self = this;
+			setListener(this.e.form, 'input', function (events) {
+				self.e.value = func.apply(self, _getVals(self.inputs));
+			});
+		}
+	}
+
 	function Field (e) {
 		switch (e.tagName) {
 			case 'SELECT': Select.call(this, e); break;
+			case 'OUTPUT': Output.call(this, e); break;
 			case 'INPUT':
 			default: Input.call(this, e); break;
 		}
@@ -107,6 +140,45 @@
 		});
 	}
 
+	Field.prototype.show = function show (show) {
+		function _enable (arr, enable) {
+			for (var i = 0, l = arr.length; i < l; ++i)
+				arr[i].disabled = !enable;
+		}
+		if (!arguments.length)
+			show = true;
+		var node = this.e;
+
+		while (node.tagName !== 'P')
+			node = node.parentNode;
+
+		var classes = node.className.split(' '),
+		    hidden = -1;
+
+		for (var i = 0, l = classes.length; i < l; ++i)
+			if (classes[i] === 'hidden') {
+				hidden = i;
+				break;
+			}
+
+		_enable(node.getElementsByTagName('input'), show);
+		_enable(node.getElementsByTagName('select'), show);
+
+		if (show) {
+			if (hidden >=0)
+				classes.splice(hidden, 1);
+		} else if (hidden < 0)
+			classes.push('hidden');
+		node.className = classes.join(' ');
+
+		return this;
+	};
+
+	Field.prototype.hide = function hide (hide) {
+		if (!arguments.length)
+			hide = true;
+		return this.show(!hide);
+	}
 
 
 	function Scanner (id) {
@@ -122,7 +194,7 @@
 		for (var i = 0, l = form.length; i < l; ++i) {
 			var e = form[i];
 			this.buttons = {};
-			if ( !{FIELDSET: 1, OUTPUT: 1}[e.tagName]) {
+			if ( !{FIELDSET: 1}[e.tagName]) {
 				var name = e.getAttribute('name');
 				var field = new Field(e);
 				var dest;
@@ -168,8 +240,10 @@
 				setListener(form, t, function (event) {
 					var target = event.target,
 					    name = target.getAttribute('name'),
-					    element = target['data-cover'],
-					    e_type = element.type;
+					    element = target['data-cover'];
+					if (!element)
+						return;
+					var e_type = element.type;
 					switch (t) {
 						case 'click':
 							switch (e_type) {
