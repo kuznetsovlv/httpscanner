@@ -50,13 +50,42 @@
 			padding-left: 10px;
 		}
 
-		span+span {
-			margin: 5px;
+		label+select, label+input {
+			margin-left: 5px;
+		}
+
+		label+input {
+			margin-left: 15px;
+		}
+
+		input[type=range] {
+			width: 250px;
+		}
+
+		span.range:before {
+			content: "0";
+			color: black;
+			font-family: Arial;
+			font-size: 17px;
+			position: relative;
+			top: 2px;
+		}
+
+		span.range:after {
+			content: "100";
+			color: black;
+			font-family: Arial;
+			font-size: 17px;
+			position: relative;
+			top: 2px;
+		}
+
+		span.range {
+			margin-left: 5px;
 		}
 
 		#submit_button {
 			border: none;
-			/*text-align: center;*/
 		}
 
 	</style>
@@ -67,7 +96,7 @@
 
 			window.onload = function () {
 				var scanner = new Scanner('scanner');
-				scanner.ask('list', function (list) {
+				scanner.ask('list', function (list) {this.qval.bound(function (a) {return a;});
 					if (!list.length) {
 						alert("No scanners found.");
 					} else {
@@ -79,22 +108,27 @@
 						}
 						this.device_name.setOptions(opts);
 						this.device_name.enabled = true;
+						
 					}
 				});
 
 				scanner.on('change', function (name, values, value) {
 					switch (name) {
 						case 'device_name':
-							this.format.setOptions({
-								'': '--Select format--',
-								'jpg': 'jpg',
-								'jpeg': 'jpeg',
-								'png': 'png'
-							});
-							this.format.enabled = true;
+							if (value) {
+								this.format.setOptions({
+									'': '--Select format--',
+									'jpg': 'jpg',
+									'jpeg': 'jpeg',
+									'png': 'png'
+								});
+								this.format.enabled = true;
+							}
 							break;
+						case 'format': this.quality.show({jpeg: 1, jpg: 1}); break;
 					}
 				});
+				console.log(scanner);
 
 			};
 		})()
@@ -104,18 +138,17 @@
 <div id="page">
 	<div id="left"></div>
 	<div id="right">
-		<form id="scanner" oninput="qval.value=parseInt(quality.value)">
+		<form id="scanner" oninput="//qval.value=parseInt(quality.value)">
 			<fieldset id="device_name">
 				<legend>Device:</legend>
-				<p><span>Get scan from device:</span><span><select name="device_name" disabled><option value="">--Select device--</option></select></span></p>
+				<p><label>Get scan from device:</label><select name="device_name" disabled><option value="">--Select device--</option></select></p>
 			</fieldset>
 
 			<fieldset id="image_property">
 				<legend>Image property:</legend>
-				<p><span>Image format:</span><span><select name="format" disabled><option value="">--Select format--</option></select></span></p>
+				<p><label>Image format:</label><select name="format" disabled><option value="">--Select format--</option></select></p>
 				<p class="jpeg hidden">
-					<span>Quality value:</span>
-					<span>0<input name="quality" type="range" value="50" disabled>100 <output name="qval" for="quality"/></span>
+					<label>Quality value:</label><span class="range"><input name="quality" type="range" value="50" disabled></span> <output name="qval" for="quality"/>
 				</p>
 			</fieldset>
 
