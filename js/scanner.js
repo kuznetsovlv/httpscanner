@@ -191,9 +191,10 @@
 
 		Element.call(this, form);
 
+		this.buttons = {};
+
 		for (var i = 0, l = form.length; i < l; ++i) {
 			var e = form[i];
-			this.buttons = {};
 			if ( !{FIELDSET: 1}[e.tagName]) {
 				var name = e.getAttribute('name');
 				var field = new Field(e);
@@ -204,7 +205,7 @@
 					case 'submit': dest = this.buttons; break;
 					default: dest = this;
 				}
-				if (dest.name)
+				if (dest[name])
 					throw ["Duplicated or incorrect name", name, "found"].join(' ');
 				dest[name] = field;
 			}
