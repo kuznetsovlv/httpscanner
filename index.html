@@ -94,6 +94,15 @@
 		(function () {
 			"use strict";
 
+			function validate (values) {
+				var list = 'device_name,format'.split(',');
+
+				for (var i = 0, l = list.length; i < l; ++i)
+					if (!values[list[i]])
+						return false;
+				return true;
+			}
+
 			window.onload = function () {
 				var scanner = new Scanner('scanner');
 				scanner.ask('list', function (list) {this.qval.bound(function (a) {return a;});
@@ -129,6 +138,11 @@
 							break;
 						case 'format': this.quality.show({jpeg: 1, jpg: 1}[value]); break;
 					}
+					var enableButtons = name !== 'device_name' && validate(values),
+					    buttons = this.buttons;
+					for (var key in buttons)
+						buttons[key].enabled = enableButtons;
+
 				});
 				console.log(scanner);
 
@@ -150,7 +164,7 @@
 				<legend>Image property:</legend>
 				<p><label>Image format:</label><select name="format" disabled><option value="">--Select format--</option></select></p>
 				<p class="jpeg hidden">
-					<label>Quality value:</label><span class="range"><input name="quality" type="range" value="50" disabled></span> <output name="qval" for="quality" disabled />
+					<label>Quality value:</label><span class="range"><input name="quality" type="range" value="75" disabled></span> <output name="qval" for="quality" disabled />
 				</p>
 			</fieldset>
 
