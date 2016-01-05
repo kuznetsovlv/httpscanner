@@ -197,6 +197,7 @@
 			if ( !{FIELDSET: 1}[e.tagName]) {
 				var name = e.getAttribute('name');
 				var field = new Field(e);
+				field.enabled = false;
 				var dest;
 				switch (field.type) {
 					case 'button':
