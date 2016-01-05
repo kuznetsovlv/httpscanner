@@ -253,7 +253,7 @@
 							}
 							break;
 						case 'change': self.emit('change', name, self.values, element.value); break;
-						case 'submit': self.emit('save', self.values); break;
+						case 'submit': self.emit('scan', self.values); break;
 						case 'reset': self.emit('reset'); break;
 						default: self.emit(t, name, self.values, element);
 					}
@@ -290,6 +290,10 @@
 			}
 		};
 		request.send(JSON.stringify(params));
+	}
+
+	Scanner.prototype.scan = function scan (values) {
+		this.emit('scan', values || this.values);
 	}
 
 	window.Scanner = Scanner;
