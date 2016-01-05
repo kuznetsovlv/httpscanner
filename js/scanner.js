@@ -140,7 +140,7 @@
 		});
 	}
 
-	Field.prototype.show = function show (show) {
+	Field.prototype.show = function show (show) {console.log(show);
 		function _enable (arr, enable) {
 			for (var i = 0, l = arr.length; i < l; ++i)
 				arr[i].disabled = !enable;
@@ -160,9 +160,9 @@
 				hidden = i;
 				break;
 			}
-
-		_enable(node.getElementsByTagName('input'), show);
-		_enable(node.getElementsByTagName('select'), show);
+		var fieldTags = 'input,select,output'.split(',');
+		for (var i = 0, l=fieldTags.length; i < l; ++i)
+			_enable(node.getElementsByTagName(fieldTags[i]), show);
 
 		if (show) {
 			if (hidden >=0)
