@@ -140,7 +140,7 @@
 		});
 	}
 
-	Field.prototype.show = function show (show) {console.log(show);
+	Field.prototype.show = function show (show) {
 		function _enable (arr, enable) {
 			for (var i = 0, l = arr.length; i < l; ++i)
 				arr[i].disabled = !enable;
@@ -240,6 +240,13 @@
 			(function () {
 				var t = type;
 				setListener(form, t, function (event) {
+					function _noDefault () {
+						if (event.PreventDefault)
+							event.PreventDefault();
+						if (event.returnValue)
+							event.returnValue = false;
+						return false;
+					}
 					var target = event.target,
 					    name = target.getAttribute('name'),
 					    element = target['data-cover'];
@@ -253,15 +260,10 @@
 							}
 							break;
 						case 'change': self.emit('change', name, self.values, element.value); break;
-						case 'submit': self.emit('scan', self.values); break;
+						case 'submit': self.emit('scan', self.values); return _noDefault();
 						case 'reset': self.emit('reset'); break;
 						default: self.emit(t, name, self.values, element);
 					}
-					if (event.PreventDefault)
-						event.PreventDefault();
-					if (event.returnValue)
-						event.returnValue = false;
-					return false;
 				});
 			})();
 		}
