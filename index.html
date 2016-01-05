@@ -113,6 +113,7 @@
 				});
 
 				scanner.on('change', function (name, values, value) {
+					console.log(name, values, value);
 					switch (name) {
 						case 'device_name':
 							if (value) {
@@ -122,10 +123,11 @@
 									'jpeg': 'jpeg',
 									'png': 'png'
 								});
-								this.format.enabled = true;
 							}
+							this.format.enabled = !!value;
+							this.quality.enabled = !!value;
 							break;
-						case 'format': this.quality.show({jpeg: 1, jpg: 1}); break;
+						case 'format': this.quality.show({jpeg: 1, jpg: 1}[value]); break;
 					}
 				});
 				console.log(scanner);
@@ -138,7 +140,7 @@
 <div id="page">
 	<div id="left"></div>
 	<div id="right">
-		<form id="scanner" oninput="//qval.value=parseInt(quality.value)">
+		<form id="scanner">
 			<fieldset id="device_name">
 				<legend>Device:</legend>
 				<p><label>Get scan from device:</label><select name="device_name" disabled><option value="">--Select device--</option></select></p>
@@ -148,7 +150,7 @@
 				<legend>Image property:</legend>
 				<p><label>Image format:</label><select name="format" disabled><option value="">--Select format--</option></select></p>
 				<p class="jpeg hidden">
-					<label>Quality value:</label><span class="range"><input name="quality" type="range" value="50" disabled></span> <output name="qval" for="quality"/>
+					<label>Quality value:</label><span class="range"><input name="quality" type="range" value="50" disabled></span> <output name="qval" for="quality" disabled />
 				</p>
 			</fieldset>
 
