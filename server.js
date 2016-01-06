@@ -1,15 +1,33 @@
 #!/usr/bin/env node
 
 (function () {
-	"use strinct";
-	var http = require('http');
+	"use strict";
+
+	var path = require('path');
+	var fs = require('fs');
+
+	var server = new (require('./lib/server'))(80);
+
+	server.on('get', function (request, response) {
+		//this.getFileSender(response, path.join(__dirname, request.url)).sendFile();
+		new FileSender(response, path.join(__dirname, request.url)).sendFile();
+	});
+
+	server.on('post', function (request, response) {
+		console.log('POST!');
+	});
+	
+
+
+
+	/*var http = require('http');
 	var fs = require('fs');
 	var path = require('path');
 	var Buffer = require('buffer').Buffer;
 	var spawn = require('child_process').spawn;
 
 	var set_status = require('./lib/status.js');
-	var set_mime = require('./lib/mime.js')
+	var set_mime = require('./lib/mime.js');
 
 	var options = {
 		defaultFile: 'index.html'
@@ -248,5 +266,5 @@
 		}
 	});
 
-	server.listen(80);
+	server.listen(80);*/
 })()
