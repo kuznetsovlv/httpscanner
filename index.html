@@ -141,7 +141,6 @@
 				});
 
 				scanner.on('change', function (name, values, value) {
-					console.log(name, values, value);
 					switch (name) {
 						case 'device_name':
 							if (value) {
@@ -182,7 +181,6 @@
 							var place = document.getElementById('left'),
 							    rect = place.getBoundingClientRect(),
 							    k = Math.min(rect.width / img.naturalWidth, rect.height / img.naturalHeight, 1);
-							console.log(img.naturalWidth, img.naturalHeight);
 							img.width = k * img.naturalWidth;
 							img.height = k * img.naturalHeight;
 							place.appendChild(img);
