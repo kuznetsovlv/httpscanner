@@ -84,7 +84,7 @@
 			margin-left: 5px;
 		}
 
-		#submit_button {
+		#buttons {
 			border: none;
 		}
 
@@ -198,18 +198,18 @@
 		<form id="scanner">
 			<fieldset id="device_name">
 				<legend>Device:</legend>
-				<p><label>Get scan from device:</label><select name="device_name" disabled><option value="">--Select device--</option></select></p>
+				<p><label for="device_name">Get scan from device:</label><select name="device_name" disabled><option value="">--Select device--</option></select></p>
 			</fieldset>
 
 			<fieldset id="image_property">
 				<legend>Image property:</legend>
-				<p><label>Image format:</label><select name="format" disabled><option value="">--Select format--</option></select></p>
+				<p><label for="format">Image format:</label><select name="format" disabled><option value="">--Select format--</option></select></p>
 				<p class="jpeg hidden">
-					<label>Quality value:</label><span class="range"><input name="quality" type="range" value="75" disabled></span> <output name="qval" for="quality" disabled />
+					<label for="quality">Quality value:</label><span class="range"><input name="quality" type="range" value="75" disabled></span> <output name="qval" for="quality" disabled />
 				</p>
 			</fieldset>
 
-			<fieldset id="submit_button">
+			<fieldset id="buttons">
 				<input type="submit" value="Scan" name="scan" disabled> <input type="button" value="Prescan" name="prescan" disabled>
 			</fieldset>
 		</form>
