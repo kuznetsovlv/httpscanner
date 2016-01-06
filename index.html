@@ -169,9 +169,14 @@
 				});
 
 				scanner.on('scan', function (values) {
-					console.log(values, convertValues(values));
+					//console.log(values, convertValues(values));
+					this.ask('scan', convertValues(values), function (link) {
+						var img = new Image();
+						img.src = link;
+						document.getElementById('left').appendChild(img);
+					});
 				});
-				console.log(scanner);
+				//console.log(scanner);
 
 			};
 		})()
