@@ -278,7 +278,7 @@
 		params.cmd = cmd;
 
 		var request = new XMLHttpRequest();
-		request.open("POST", "");
+		request.open("POST", this.job || '');
 		request.setRequestHeader("Content-Type", "application/json");
 		request.onreadystatechange = function () {
 			if (request.readyState == 4){
@@ -286,7 +286,7 @@
 				if (status >= 200 && status < 300) {
 					callback.call(self, request.getResponseHeader("Content-Type") === 'application/json' ? JSON.parse(request.responseText) : request.responseText);
 				} else {
-					alert(['ERROR', status, '\n', request.statusMassage].join(''));
+					alert(['ERROR ', status, '\n', request.statusText].join(''));
 				}
 			}
 		};

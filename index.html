@@ -124,7 +124,15 @@
 
 			window.onload = function () {
 				var scanner = new Scanner('scanner');
-				scanner.ask('list', function (list) {this.qval.bound(function (a) {return a;});
+
+				scanner.ask('init', function (job) {
+					this.job = job;
+					this.ask('list', function (list) {
+						console.log(list);
+					});
+				});
+				/*scanner.ask('list', function (list) {this.qval.bound(function (a) {return a;});
+
 					if (!list.length) {
 						alert("No scanners found.");
 					} else {
@@ -186,7 +194,7 @@
 							place.appendChild(img);
 						};
 					});
-				});
+				});*/
 			};
 		})()
 	</script>

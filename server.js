@@ -3,18 +3,33 @@
 (function () {
 	"use strict";
 
-	var path = require('path');
-	var fs = require('fs');
+	const path = require('path');
 
-	var server = new (require('./lib/server'))(80);
+	const scanServer = require('scanserver');
+
+	const server = new scanServer.Server(80);
 
 	server.on('get', function (request, response) {
-		//this.getFileSender(response, path.join(__dirname, request.url)).sendFile();
-		new FileSender(response, path.join(__dirname, request.url)).sendFile();
+		new scanServer.FileSender(response, path.join(__dirname, request.url)).sendFile();
 	});
 
 	server.on('post', function (request, response) {
-		console.log('POST!');
+		const self = this;
+		var responser = new scanServer.Responser(response);
+
+		var data = [];
+		request.on('data', function (chunk) {data.push(chunk);});
+		request.on('end', function () {
+			data = data.join('');
+			if (!request.headers['content-type'] === 'application/json')
+				responser.sendError(400, 'Content must be application/json');
+			try {
+				data = JSON.parse(data);
+			} catch (e) {
+				responser.sendError(400, 'Wrong JSON');
+			}
+			self.jobber.emit(data.cmd, response, request.url.substr(1), data);
+		});
 	});
 	
 
