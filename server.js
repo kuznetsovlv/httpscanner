@@ -7,7 +7,13 @@
 
 	const scanServer = require('scanserver');
 
+	const config = require('./config.json');
+
 	const server = new scanServer.Server(80);
+
+	console.log(config);
+
+	console.log(JSON.stringify(config));
 
 	server.on('get', function (request, response) {
 		new scanServer.FileSender(response, path.join(__dirname, request.url)).sendFile();

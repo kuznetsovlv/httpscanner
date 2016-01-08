@@ -1,0 +1,62 @@
+{
+	"fields": {
+		"format": {
+			"description": "Image format",
+			"type": "select",
+			"options": [
+				{
+					"value": "",
+					"description": "--Select format--"
+				},
+				{
+					"value": "jpeg,jpg",
+					"converter": "pnmtojpeg",
+					"subfields": {
+						"quality": {
+							"description": "Quality value",
+							"type": "range",
+							"value": "75",
+							"min": "0",
+							"max": "100"
+						},
+						"optimization": {
+							"description": "Optimization type",
+							"type": "select",
+							"options": [
+								{
+									"value": "",
+									"description": "none"
+								},
+								{
+									"value": "optimize",
+									"description": "optimize"
+								},
+								{
+									"value": "progressive",
+									"description": "progressive"
+								}
+							]
+						},
+						"comment": {
+							"description": "Commetnt",
+							"type": "text"
+						}
+					}
+				},
+				{
+					"value": "png",
+					"converter": "pnmtopng",
+					"subfields": {
+						"compression": {
+							"description": "File compression",
+							"type": "range",
+							"value": "0",
+							"min": "0",
+							"max": "9"
+						}
+					}
+				}
+			]
+		}
+	}
+}
