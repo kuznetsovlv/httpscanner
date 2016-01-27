@@ -1,62 +1,16 @@
 {
-	"fields": {
-		"format": {
-			"description": "Image format",
-			"type": "select",
-			"options": [
-				{
-					"value": "",
-					"description": "--Select format--"
-				},
-				{
-					"value": "jpeg,jpg",
-					"converter": "pnmtojpeg",
-					"subfields": {
-						"quality": {
-							"description": "Quality value",
-							"type": "range",
-							"value": "75",
-							"min": "0",
-							"max": "100"
-						},
-						"optimization": {
-							"description": "Optimization type",
-							"type": "select",
-							"options": [
-								{
-									"value": "",
-									"description": "none"
-								},
-								{
-									"value": "optimize",
-									"description": "optimize"
-								},
-								{
-									"value": "progressive",
-									"description": "progressive"
-								}
-							]
-						},
-						"comment": {
-							"description": "Commetnt",
-							"type": "text"
-						}
-					}
-				},
-				{
-					"value": "png",
-					"converter": "pnmtopng",
-					"subfields": {
-						"compression": {
-							"description": "File compression",
-							"type": "range",
-							"value": "0",
-							"min": "0",
-							"max": "9"
-						}
-					}
+	"scanners": [
+		{
+			"type": "Epson L210/L350/L351 Series",
+			"fields": {
+				"resolution": "75|150|300|600",
+				"geometry": {
+					"l": "0-215.9",
+					"t": "0-297.18",
+					"x": "l-215.9",
+					"y": "t-297.18"
 				}
-			]
+			}
 		}
-	}
+	]
 }

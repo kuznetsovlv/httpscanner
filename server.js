@@ -5,39 +5,108 @@
 
 	const path = require('path');
 
+	const spawn = require('child_process').spawn;
+
 	const scanServer = require('scanserver');
+
+	const utils = require('utils');
 
 	const config = require('./config.json');
 
-	const server = new scanServer.Server(80);
+	const server = new scanServer.Server(__dirname, 80);
 
-	console.log(config);
 
-	console.log(JSON.stringify(config));
 
-	server.on('get', function (request, response) {
-		new scanServer.FileSender(response, path.join(__dirname, request.url)).sendFile();
-	});
+	/*console.log(config);
 
-	server.on('post', function (request, response) {
-		const self = this;
-		var responser = new scanServer.Responser(response);
+	console.log(JSON.stringify(config));*/
 
-		var data = [];
-		request.on('data', function (chunk) {data.push(chunk);});
-		request.on('end', function () {
-			data = data.join('');
-			if (!request.headers['content-type'] === 'application/json')
-				responser.sendError(400, 'Content must be application/json');
-			try {
-				data = JSON.parse(data);
-			} catch (e) {
-				responser.sendError(400, 'Wrong JSON');
+	function scanner (args, options) {
+		return spawn('scanimage', args, options);
+	}
+
+	function scanDevices () {
+		let data = '';
+		let self = this;
+
+		let scan = scanner(['-f %i\t%d\t%v\t%m\t%n']);
+
+		scan.stdout.on('data', (chunk) => {data += chunk;});
+		scan.stdout.on('error', (data) => {console.log(data);})
+		scan.on('close', (code) => {
+			if (code) {
+				self.emit('error', 503, "Stopped with code " + code);
+			} else {
+				data = data.split('\n');
+				let list = [];
+				for (let i = 0, l = data.length; i < l; ++i) {
+					let raw = data[i];
+					if (!raw)
+						continue;
+					raw = raw.trim().split('\t');
+					let tmp = {
+						i: +raw[0],
+						name: raw[1],
+						description: [raw[2], raw[3]].join(' ')
+					},
+					scanners = config.scanners;
+					for (let i = 0, l = scanners.length; i < l; ++i)
+						if (tmp.description === scanners[i].type) {
+							tmp.fields = utils.clone(scanners[i].fields);
+							list.push(tmp);
+							break;
+						}
+				}
+				list.sort(function (a, b) {return a.i - b.i});
+				self.emit('dataComplete', list);
 			}
-			self.jobber.emit(data.cmd, response, request.url.substr(1), data);
 		});
+		scan.stderr.on('data', function () {sendError(response, 520);});
+
+	}
+
+	function readConfig (cmd, values) {
+
+		switch (cmd) {
+			case 'list': scanDevices.call(this); break;
+			default: this.sendError(405, 'Unknown command: ' + cmd);
+		}
+
+	};
+
+	server.jobs.on('data', function (type, data) {
+
+		if (type !== 'application/json')
+			this.sendError(400, 'The content-type must be an "application/json".');
+		data = JSON.parse(data);
+
+
+		if (!(data instanceof Array))
+			this.sendError(400, 'Content must be an Array.');
+
+		let common = {};
+		for (let i = 0, j = 1, l = data.length; i < l; ++i, ++j) {
+			let di = data[i], dj = data[j];
+			switch (typeof di) {
+				case 'object': common = di; continue; break;
+				case 'string': readConfig.call(this, di, typeof dj === 'object' ? utils.joiny(dj, common) : common); break;
+				default: this.sendError(400, 'The type of content elements must be a string or an object');
+			}
+		}
 	});
-	
+
+	server.jobs.on('dataComplete', function (data) {
+		if (typeof data === 'object')
+			this.sendData(JSON.stringify(data), 'json');
+		else
+			this.sendData(data, 'txt');
+	});
+
+	server.jobs.on('error', function (code, msg) {
+		this.sendError(code, msg);
+	});
+
+	server.up();
 
 
 

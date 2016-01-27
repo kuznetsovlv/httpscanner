@@ -269,13 +269,10 @@
 		}
 	}
 
-	Scanner.prototype.ask = function (cmd, params, callback) {
-		if (typeof params === 'function') {
-			callback = params;
-			params = {};
-		}
-		var self = this;
-		params.cmd = cmd;
+	Scanner.prototype.ask = function () {
+		var cmds = Array.prototype.slice.call(arguments, 0, -1),
+		    callback = Array.prototype.slice.call(arguments, -1)[0],
+		    self = this;
 
 		var request = new XMLHttpRequest();
 		request.open("POST", this.job || '');
@@ -290,7 +287,7 @@
 				}
 			}
 		};
-		request.send(JSON.stringify(params));
+		request.send(JSON.stringify(cmds));
 	}
 
 	Scanner.prototype.scan = function scan (values) {
