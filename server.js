@@ -42,45 +42,42 @@
 			scan.stderr.on('data', (data) => {stderr.call(self, data)});
 		}
 
-		scan.on('close', (code) => {callback.call(self, code, data)});
+		scan.on('close', (code) => {
+			if (code) {
+				self.emit('error', 503, "Stopped with code " + code);
+			else
+				callback.call(self, data)});
 	}
 
 	function scanDevices () {
-		let data = '';
-		let self = this;
-
-		scanner(['-f %i\t%d\t%v\t%m\t%n'], (code, data) => {
-			if (code) {
-				self.emit('error', 503, "Stopped with code " + code);
-			} else {
-				data = data.split('\n');
-				let list = [];
-				for (let i = 0, l = data.length; i < l; ++i) {
-					let raw = data[i];
-					if (!raw)
-						continue;
-					raw = raw.trim().split('\t');
-					let tmp = {
-						i: +raw[0],
-						name: raw[1],
-						description: [raw[2], raw[3]].join(' ')
-					},
-					scanners = config.scanners;
-					for (let i = 0, l = scanners.length; i < l; ++i)
-						if (tmp.description === scanners[i].type) {
-							tmp.fields = utils.clone(scanners[i].fields);
-							list.push(tmp);
-							break;
-						}
-				}
-				list.sort(function (a, b) {return a.i - b.i});
-				self.emit('dataComplete', list);
+		scanner(['-f %i\t%d\t%v\t%m\t%n'], (data) => {
+			data = data.split('\n');
+			let list = [];
+			for (let i = 0, l = data.length; i < l; ++i) {
+				let raw = data[i];
+				if (!raw)
+					continue;
+				raw = raw.trim().split('\t');
+				let tmp = {
+					i: +raw[0],
+					name: raw[1],
+					description: [raw[2], raw[3]].join(' ')
+				},
+				scanners = config.scanners;
+				for (let i = 0, l = scanners.length; i < l; ++i)
+					if (tmp.description === scanners[i].type) {
+						tmp.fields = utils.clone(scanners[i].fields);
+						list.push(tmp);
+						break;
+					}
 			}
+			list.sort(function (a, b) {return a.i - b.i});
+			this.emit('dataComplete', list);
 		}, (data) => {console.log(data); this.emit('error', 503, data)}, (data) => {this.emit('error', 520, data)});
 	}
 
 	/*function holdDevice (name) {
-		let scan = scanner(['-d ' + name, '-n']);
+		scanner(['-d ' + name, '-n'], (code, ));
 
 		if (server.busy[name]) {
 			this.emit('error', 503, 'Device ' + name + ' busy.');
