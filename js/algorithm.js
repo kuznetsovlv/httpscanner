@@ -9,7 +9,7 @@
 			console.log(response.status + ": " + response.statusText);
 		};
 
-		$scope.formats = ['jpg', 'jpeg', 'gif', 'png', 'bmp'];
+		$scope.formats = 'jpg,jpeg,gif,bmp'.split(',').sort();
 		$scope.cmd = function (cmd, data,/*cmd, data, ...,*/ callback, errHandler) {
 			this.inWait = true;
 			var self = this,
@@ -41,8 +41,7 @@
 			});
 		};
 
-		$scope.hold = function (device) {console.log("|" + device + "-");
-			console.log(this);
+		$scope.hold = function (device) {
 			this.cmd('hold', {name: device}, function (responce) {
 				console.log(this);
 				this.holded = device;

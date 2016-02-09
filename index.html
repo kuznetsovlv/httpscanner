@@ -13,12 +13,12 @@
 		<form id="scanner" name="scanform">
 			<fieldset id="device_name">
 				<legend>Device:</legend>
-				<p><label for="device_name">Get scan from device:</label><select name="device_name" data-ng-model="device" data-ng-disabled="!(list && list.length)" data-ng-options="x.description + ' ('  + x.name + ')' for x in list" data-ng-change="hold(device.name)"></select></p>
+				<p><label for="device_name">Get scan from device:</label><select name="device_name" data-ng-model="device" data-ng-disabled="!(list && list.length)" data-ng-options="x.description + ' ('  + x.name + ')' for x in list | orderBy 'i'" data-ng-change="hold(device.name)"></select></p>
 			</fieldset>
 
 			<fieldset id="image_property">
 				<legend>Image property:</legend>
-				<p><label for="format">Image format:</label><select name="format" data-ng-disabled="!(holded && holded === device.name)" data-ng-model="format" data-ng-options="x for x in formats"></select></p>
+				<p><label for="format">Image format:</label><select name="format" data-ng-disabled="!(holded && holded === device.name)" data-ng-model="format" data-ng-options="x for x in formats | orderBy 'x'"></select></p>
 				<p class="jpeg hidden">
 					<label for="quality">Quality value:</label><span class="range"><input name="quality" type="range" value="75" disabled></span> <output name="qval" for="quality" disabled />
 				</p>
