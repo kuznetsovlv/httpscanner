@@ -18,82 +18,98 @@
 	const WAIT = 20 * (60 * 1000);
 
 
-	/*console.log(config);
-
-	console.log(JSON.stringify(config));*/
-
 	server.busy = {};
 
-	/*function scanner (args, options) {
-		return spawn('scanimage', args, options);
-	}*/
-
-	function scanner (args, callback, stdoutErr, stderr) {
-		if (!stderr)
-			stderr = stdoutErr;
+	function scanner (args, handlers/* callback, stdoutErr, stderr*/) {
 		let scan  = spawn('scanimage', args);
 		let self = this;
 		let data = '';
 
-		scan.stdout.on('data', (chunk) => {data += chunk;});
-
-		if (stdoutErr) {
-			scan.stdout.on('error', (data) => {stdoutErr.call(self, data)});
-			scan.stderr.on('data', (data) => {stderr.call(self, data)});
-		}
-
-		scan.on('close', (code) => {
-			if (code)
-				self.emit('error', 503, "Stopped with code " + code);
+		scan.stdout.on('data', (chunk) => {
+			if (handlers.stdout)
+				handlers.stdout.call(self, chunk);
 			else
-				callback.call(self, data)});
+				data += chunk;
+		});
+
+		if (handlers.stdoutErr)
+			scan.stdout.on('error', (data) => {handlers.stdoutErr.call(self, data)});
+		if(handlers.stderr)
+			scan.stderr.on('data', (data) => {handlers.stderr.call(self, data)});
+		if (handlers.close)
+			scan.on('close', (code) => {
+				if (code)
+					self.emit('error', 503, "Stopped with code " + code);
+				else
+					handlers.close.call(self, data)});
 	}
 
 	function scanDevices () {
-		scanner(['-f %i\t%d\t%v\t%m\t%n'], (data) => {
-			data = data.split('\n');
-			let list = [];
-			for (let i = 0, l = data.length; i < l; ++i) {
-				let raw = data[i];
-				if (!raw)
-					continue;
-				raw = raw.trim().split('\t');
-				let tmp = {
-					i: +raw[0],
-					name: raw[1],
-					description: [raw[2], raw[3]].join(' ')
-				},
-				scanners = config.scanners;
-				for (let i = 0, l = scanners.length; i < l; ++i)
-					if (tmp.description === scanners[i].type) {
-						tmp.fields = utils.clone(scanners[i].fields);
-						list.push(tmp);
-						break;
-					}
-			}
-			list.sort(function (a, b) {return a.i - b.i});
-			this.emit('dataComplete', list);
-		}, (data) => {console.log(data); this.emit('error', 503, data)}, (data) => {this.emit('error', 520, data)});
+		let handlers = {
+			close: (data) => {
+				data = data.split('\n');
+				let list = [];
+				for (let i = 0, l = data.length; i < l; ++i) {
+					let raw = data[i];
+					if (!raw)
+						continue;
+					raw = raw.trim().split('\t');
+					let tmp = {
+						i: +raw[0],
+						name: raw[1],
+						description: [raw[2], raw[3]].join(' ')
+					},
+					scanners = config.scanners;
+					for (let i = 0, l = scanners.length; i < l; ++i)
+						if (tmp.description === scanners[i].type) {
+							tmp.fields = utils.clone(scanners[i].fields);
+							list.push(tmp);
+							break;
+						}
+				}
+				list.sort(function (a, b) {return a.i - b.i});
+				this.emit('dataComplete', list);
+			},
+			stdoutErr: (data) => {console.log(data); this.emit('error', 503, data)},
+			stderr: (data) => {this.emit('error', 520, data)}
+		}
+		scanner(['-f %i\t%d\t%v\t%m\t%n']handlers);
 	}
 
-	/*function holdDevice (name) {
-		scanner(['-d ' + name, '-n'], (code, ));
+	function holdDevice (name) {
+		scanner(['-d ' + name, '-n'], (data) {
+			if (server.busy[name]) {
+				this.cmds = [];
+				this.emit('error', 503, 'Device ' + name + ' busy.');
+				return;
+			}
 
-		if (server.busy[name]) {
-			this.emit('error', 503, 'Device ' + name + ' busy.');
-			this.cmds = [];
-			return;
+			server.busy[name] = this.name;
+			this.device = name;
+			this.emit('dataComplete', name);
+		});
+	}
+
+	function scan (values) {
+		let args = ['-d ' + this.device];
+		let p = 'resolution,l,t,x,y'.split(',');
+
+		for (let i = 0, l = p.length; i < l; ++i) {
+			let arg = p[i];
+			let key = ['-'];
+			if (arg.length > 1)
+				key.push('-');
+			key.push(arg);
+			args.push(key.join('') + ' ' + values[arg]);
 		}
-
-		server.busy[name] = this.name;
-		this.device = name;
-	}*/
+	}
 
 	function performCmd (cmd, values) {
 		switch (cmd) {
 			case 'close': this.emit('finish', true); break;
-			//case 'hold': holdDevice.call(this, values.name); break; 
+			case 'hold': holdDevice.call(this, values.name); break; 
 			case 'list': scanDevices.call(this); break;
+			case 'scan': scan.call(this, values); break;
 			default: tthis.emit('error', 405, 'Unknown command: ' + cmd);
 		}
 
