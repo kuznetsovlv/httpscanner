@@ -24,7 +24,7 @@
 
 	server.busy = {};
 
-	function scanner (args, handlers) {console.log(args);
+	function scanner (args, handlers) {
 		let scan  = spawn('scanimage', args);
 		let self = this;
 		let data = '';
