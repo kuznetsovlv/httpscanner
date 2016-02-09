@@ -78,7 +78,7 @@
 
 	function holdDevice (name) {
 		let handlers = {
-			close: (data) {
+			close: (data) => {
 				if (server.busy[name]) {
 					this.cmds = [];
 					this.emit('error', 503, 'Device ' + name + ' busy.');
