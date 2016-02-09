@@ -40,6 +40,18 @@
 			});
 		};
 
+		$scope.hold = function (device) {
+			this.cmd('hold', {name: device}, function (responce) {
+				this.hold = device;
+			}, function (response) {
+				if (response.status == 409){
+					setTimeout(this.hold(device), 2 * 60 * 1000);
+				} else {
+					alert('Can not hold device ' + device + '\nError ' + response.status + ": " + response.statusText);
+				}
+			});
+		}
+
 		$http({
 			method: 'POST',
 			url: ''
@@ -47,7 +59,6 @@
 			$scope.job = response.data;
 			$scope.cmd('list', function (response) {
 				this.list = response.data[0];
-				console.log(this);
 			}, function (response) {
 				alert('Connection corrupted\nError ' + response.status + ": " + response.statusText);
 			});
