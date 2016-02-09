@@ -96,7 +96,7 @@
 			stdoutErr: (data) => {this.emit('error', 503, data);},
 			stderr: (data) => {this.emit('error', 520, data);}
 		}
-		scanner.call(this, ['-d ' + name, '-n'], handlers);
+		scanner.call(this, ['-d ' + name, '-L'], handlers);
 	}
 
 	function scan (values) {
