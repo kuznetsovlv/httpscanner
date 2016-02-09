@@ -45,7 +45,8 @@
 		}).then(function (response) {
 			$scope.job = response.data;
 			$scope.cmd('list', function (response) {
-				console.log(response.data);
+				this.list = response.data[0];
+				console.log(this.list);
 			}, function (response) {
 				alert('Connection corrupted\nError ' + response.status + ": " + response.statusText);
 			});
