@@ -85,7 +85,7 @@
 			close: (data) => {
 				if (server.busy[name]) {
 					this.cmds = [];
-					this.emit('error', 503, 'Device ' + name + ' busy.');
+					this.emit('error', 409, 'Device ' + name + ' busy.');
 					return;
 				}
 	
