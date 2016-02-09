@@ -15,25 +15,41 @@
 
 	const server = new scanServer.Server(__dirname, 80);
 
+	const WAIT = 20 * (60 * 1000);
 
 
 	/*console.log(config);
 
 	console.log(JSON.stringify(config));*/
 
-	function scanner (args, options) {
+	server.busy = {};
+
+	/*function scanner (args, options) {
 		return spawn('scanimage', args, options);
+	}*/
+
+	function scanner (args, callback, stdoutErr, stderr) {
+		if (!stderr)
+			stderr = stdoutErr;
+		let scan  = spawn('scanimage', args);
+		let self = this;
+		let data = '';
+
+		scan.stdout.on('data', (chunk) => {data += chunk;});
+
+		if (stdoutErr) {
+			scan.stdout.on('error', stdoutErr.call(self, data));
+			scan.stderr.on('data', stderr.call(self, data));
+		}
+
+		scan.on('close', callback.call(self, code));
 	}
 
 	function scanDevices () {
 		let data = '';
 		let self = this;
 
-		let scan = scanner(['-f %i\t%d\t%v\t%m\t%n']);
-
-		scan.stdout.on('data', (chunk) => {data += chunk;});
-		scan.stdout.on('error', (data) => {console.log(data);})
-		scan.on('close', (code) => {
+		scanner(['-f %i\t%d\t%v\t%m\t%n'], (code) => {
 			if (code) {
 				self.emit('error', 503, "Stopped with code " + code);
 			} else {
@@ -60,50 +76,94 @@
 				list.sort(function (a, b) {return a.i - b.i});
 				self.emit('dataComplete', list);
 			}
-		});
-		scan.stderr.on('data', function () {sendError(response, 520);});
-
+		}, (data) => {console.log(data); this.emit('error', 503, data)}, (data) => {this.emit('error', 520, data)});
 	}
 
-	function readConfig (cmd, values) {
+	/*function holdDevice (name) {
+		let scan = scanner(['-d ' + name, '-n']);
 
+		if (server.busy[name]) {
+			this.emit('error', 503, 'Device ' + name + ' busy.');
+			this.cmds = [];
+			return;
+		}
+
+		server.busy[name] = this.name;
+		this.device = name;
+	}*/
+
+	function performCmd (cmd, values) {
 		switch (cmd) {
+			case 'close': this.emit('finish', true); break;
+			//case 'hold': holdDevice.call(this, values.name); break; 
 			case 'list': scanDevices.call(this); break;
-			default: this.sendError(405, 'Unknown command: ' + cmd);
+			default: tthis.emit('error', 405, 'Unknown command: ' + cmd);
 		}
 
 	};
 
 	server.jobs.on('data', function (type, data) {
 
-		if (type !== 'application/json')
-			this.sendError(400, 'The content-type must be an "application/json".');
+		if (this.waiting)
+			clearTimeout(this.waiting);
+
+		if (this.finished)
+			this.clear(408);
+
+		if (!/\bapplication\/json\b/.test(type))
+			this.emit('error', 400, 'The content-type must be an "application/json".');
 		data = JSON.parse(data);
 
 
 		if (!(data instanceof Array))
-			this.sendError(400, 'Content must be an Array.');
+			this.emit('error', 400, 'Content must be an Array.');
 
 		let common = {};
+		this.cmds = [];
 		for (let i = 0, j = 1, l = data.length; i < l; ++i, ++j) {
 			let di = data[i], dj = data[j];
 			switch (typeof di) {
 				case 'object': common = di; continue; break;
-				case 'string': readConfig.call(this, di, typeof dj === 'object' ? utils.joiny(dj, common) : common); break;
-				default: this.sendError(400, 'The type of content elements must be a string or an object');
+				case 'string': this.cmds.push([di, typeof dj === 'object' ? utils.joiny(dj, common) : common]); break;
+				default: this.emit('error', 400, 'The type of content elements must be a string or an object');
 			}
 		}
+
+		if (this.cmds.length)
+			performCmd.apply(this, this.cmds.shift());
 	});
 
 	server.jobs.on('dataComplete', function (data) {
-		if (typeof data === 'object')
-			this.sendData(JSON.stringify(data), 'json');
+		if (!this.answers)
+			this.answers = [data];
 		else
-			this.sendData(data, 'txt');
+			this.answers.push(data);
+
+		if (this.cmds.length) {
+			performCmd.apply(this, this.cmds.shift());
+		} else {
+			let self = this;
+			setTimeout(() => {self.emit('finish');}, WAIT);
+			this.sendData(JSON.stringify(this.answers), 'json');
+		}
 	});
 
 	server.jobs.on('error', function (code, msg) {
+		let self = this;
+		setTimeout(() => {self.emit('finish');}, WAIT);
 		this.sendError(code, msg);
+	});
+
+	server.jobs.once('finish', function (finalize) {
+		if (this.device) {
+			delete server.busy[this.device];
+			delete this.device;
+		}
+		this.cmds = [];
+		 if (finalize)
+		 	this.clear(200);
+		 else
+		 	this.finished = true;
 	});
 
 	server.up();
