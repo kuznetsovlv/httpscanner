@@ -42,14 +42,14 @@
 			scan.stderr.on('data', (data) => {stderr.call(self, data)});
 		}
 
-		scan.on('close', (code) => {callback.call(self, code)});
+		scan.on('close', (code) => {callback.call(self, code, data)});
 	}
 
 	function scanDevices () {
 		let data = '';
 		let self = this;
 
-		scanner(['-f %i\t%d\t%v\t%m\t%n'], (code) => {
+		scanner(['-f %i\t%d\t%v\t%m\t%n'], (code, data) => {
 			if (code) {
 				self.emit('error', 503, "Stopped with code " + code);
 			} else {
