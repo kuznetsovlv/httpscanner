@@ -8,9 +8,9 @@
 </head>
 <body>
 <div id="page" data-ng-app="scanner" data-ng-controller="scannerCtrl">
-	<div id="left">{{device.description}}</div>
+	<div id="left"></div>
 	<div id="right">
-		<form id="scanner">
+		<form id="scanner" name="scanform">
 			<fieldset id="device_name">
 				<legend>Device:</legend>
 				<p><label for="device_name">Get scan from device:</label><select name="device_name" data-ng-model="device" data-ng-disabled="!(list && list.length)" data-ng-options="x.description + ' ('  + x.name + ')' for x in list"></select></p>
@@ -18,7 +18,7 @@
 
 			<fieldset id="image_property">
 				<legend>Image property:</legend>
-				<p><label for="format">Image format:</label><select name="format" disabled><option value="">--Select format--</option></select></p>
+				<p><label for="format">Image format:</label><select name="format" data-ng-disabled="!device"><option value="">--Select format--</option></select></p>
 				<p class="jpeg hidden">
 					<label for="quality">Quality value:</label><span class="range"><input name="quality" type="range" value="75" disabled></span> <output name="qval" for="quality" disabled />
 				</p>
