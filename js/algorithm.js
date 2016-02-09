@@ -9,7 +9,7 @@
 			console.log(response.status + ": " + response.statusText);
 		};
 
-		$scope.formats = 'jpg,jpeg,gif,bmp'.split(',').sort();
+		$scope.formats = 'jpg,jpeg,gif,bmp,png'.split(',').sort();
 		$scope.cmd = function (cmd, data,/*cmd, data, ...,*/ callback, errHandler) {
 			this.inWait = true;
 			var self = this,
