@@ -44,7 +44,7 @@
 			console.log(this);
 			this.cmd('hold', {name: device}, function (responce) {
 				console.log(this);
-				this.hold = device;
+				this.holded = device;
 			}, function (response) {
 				if (response.status == 409){
 					setTimeout(this.hold(device), 2 * 60 * 1000);
