@@ -73,7 +73,7 @@
 			stdoutErr: (data) => {console.log(data); this.emit('error', 503, data)},
 			stderr: (data) => {this.emit('error', 520, data)}
 		}
-		scanner(['-f %i\t%d\t%v\t%m\t%n']handlers);
+		scanner(['-f %i\t%d\t%v\t%m\t%n'], handlers);
 	}
 
 	function holdDevice (name) {
