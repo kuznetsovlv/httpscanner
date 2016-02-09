@@ -41,6 +41,7 @@
 		};
 
 		$scope.hold = function (device) {console.log("|" + device + "-");
+			console.log(this);
 			this.cmd('hold', {name: device}, function (responce) {
 				console.log(this);
 				this.hold = device;
@@ -60,6 +61,7 @@
 			$scope.job = response.data;
 			$scope.cmd('list', function (response) {
 				this.list = response.data[0];
+				console.log(this);
 			}, function (response) {
 				alert('Connection corrupted\nError ' + response.status + ": " + response.statusText);
 			});
