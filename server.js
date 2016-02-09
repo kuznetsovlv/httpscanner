@@ -38,11 +38,11 @@
 		scan.stdout.on('data', (chunk) => {data += chunk;});
 
 		if (stdoutErr) {
-			scan.stdout.on('error', stdoutErr.call(self, data));
-			scan.stderr.on('data', stderr.call(self, data));
+			scan.stdout.on('error', (data) => {stdoutErr.call(self, data)});
+			scan.stderr.on('data', (data) => {stderr.call(self, data)});
 		}
 
-		scan.on('close', callback.call(self, code));
+		scan.on('close', (code) => {callback.call(self, code)});
 	}
 
 	function scanDevices () {
