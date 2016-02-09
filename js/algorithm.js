@@ -40,8 +40,9 @@
 			});
 		};
 
-		$scope.hold = function (device) {
+		$scope.hold = function (device) {console.log("|" + device + "-");
 			this.cmd('hold', {name: device}, function (responce) {
+				console.log(this);
 				this.hold = device;
 			}, function (response) {
 				if (response.status == 409){
