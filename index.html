@@ -18,7 +18,7 @@
 
 			<fieldset id="image_property">
 				<legend>Image property:</legend>
-				<p><label for="format">Image format:</label><select name="format" data-ng-disabled="!(holded && holded === device.name)"><option value="">--Select format--</option></select></p>
+				<p><label for="format">Image format:</label><select name="format" data-ng-disabled="!(holded && holded === device.name)" data-ng-model="formats" data-ng-options="x for x in formats"></select></p>
 				<p class="jpeg hidden">
 					<label for="quality">Quality value:</label><span class="range"><input name="quality" type="range" value="75" disabled></span> <output name="qval" for="quality" disabled />
 				</p>

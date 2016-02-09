@@ -9,6 +9,7 @@
 			console.log(response.status + ": " + response.statusText);
 		};
 
+		$scope.formats = ['jpg', 'jpeg', 'gif', 'png', 'bmp'];
 		$scope.cmd = function (cmd, data,/*cmd, data, ...,*/ callback, errHandler) {
 			this.inWait = true;
 			var self = this,
