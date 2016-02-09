@@ -11,7 +11,8 @@
 
 		$scope.cmd = function (cmd, data,/*cmd, data, ...,*/ callback, errHandler) {
 			this.inWait = true;
-			var cmds = [];
+			var self = this,
+			    cmds = [];
 			for (var i = 0, l = arguments.length; i < l; ++i) {
 				var arg = arguments[i];
 				if (typeof arg === 'function') {
