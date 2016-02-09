@@ -77,17 +77,22 @@
 	}
 
 	function holdDevice (name) {
-		scanner(['-d ' + name, '-n'], (data) {
-			if (server.busy[name]) {
-				this.cmds = [];
-				this.emit('error', 503, 'Device ' + name + ' busy.');
-				return;
-			}
-
-			server.busy[name] = this.name;
-			this.device = name;
-			this.emit('dataComplete', name);
-		});
+		let handlers = {
+			close: (data) {
+				if (server.busy[name]) {
+					this.cmds = [];
+					this.emit('error', 503, 'Device ' + name + ' busy.');
+					return;
+				}
+	
+				server.busy[name] = this.name;
+				this.device = name;
+				this.emit('dataComplete', name);
+			},
+			stdoutErr: (data) => {console.log(data); this.emit('error', 503, data)},
+			stderr: (data) => {this.emit('error', 520, data)}
+		}
+		scanner(['-d ' + name, '-n'], handlers);
 	}
 
 	function scan (values) {
