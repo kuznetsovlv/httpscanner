@@ -24,7 +24,7 @@
 
 	server.busy = {};
 
-	function scanner (args, handlers/* callback, stdoutErr, stderr*/) {
+	function scanner (args, handlers) {console.log(args);
 		let scan  = spawn('scanimage', args);
 		let self = this;
 		let data = '';
@@ -93,10 +93,10 @@
 				this.device = name;
 				this.emit('dataComplete', name);
 			},
-			stdoutErr: (data) => {console.log(data); this.emit('error', 503, data)},
-			stderr: (data) => {this.emit('error', 520, data)}
+			stdoutErr: (data) => {this.emit('error', 503, data);},
+			stderr: (data) => {this.emit('error', 520, data);}
 		}
-		scanner.call(this, ['-nd ' + name], handlers);
+		scanner.call(this, ['-d ' + name, '-n'], handlers);
 	}
 
 	function scan (values) {
