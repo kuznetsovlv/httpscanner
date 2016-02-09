@@ -19,7 +19,7 @@
 
 	const WAIT = 20 * (60 * 1000);
 
-	const SCAN_DIR = path(__dirname, 'scans');
+	const SCAN_DIR = path.join(__dirname, 'scans');
 
 
 	server.busy = {};
