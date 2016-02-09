@@ -43,7 +43,7 @@
 		}
 
 		scan.on('close', (code) => {
-			if (code) {
+			if (code)
 				self.emit('error', 503, "Stopped with code " + code);
 			else
 				callback.call(self, data)});
