@@ -5,13 +5,12 @@
 	var app = angular.module('scanner', []);
 
 	app.controller('scannerCtrl', function ($scope, $http) {
-		console.log($scope);
-
 		$http.httpError = function (response) {
 			console.log(response.status + ": " + response.statusText);
 		};
 
 		$scope.cmd = function (cmd, data,/*cmd, data, ...,*/ callback, errHandler) {
+			this.inWait = true;
 			var cmds = [];
 			for (var i = 0, l = arguments.length; i < l; ++i) {
 				var arg = arguments[i];
@@ -31,7 +30,13 @@
 				'content-type': 'application/json'
 			},
 				data: JSON.stringify(cmds)
-			}).then(callback, errHandler || $http.httpError);
+			}).then(function (response) {
+				self.inWait = false;
+				callback.call(self, response);
+			}, function (response) {
+				self.inWait = false;
+				(errHandler || this.httpError).call(self, response);
+			});
 		};
 
 		$http({
@@ -39,11 +44,13 @@
 			url: ''
 		}).then(function (response) {
 			$scope.job = response.data;
-			console.log($scope);
-			/*$scope.cmd('data', function (response) {
-				$scope.data = response.data[0] || {};
-				$scope.rebuild();
-			});*/
-		}, $http.httpError);
+			$scope.cmd('list', function (response) {
+				console.log(response.data);
+			}, function (response) {
+				alert('Connection corrupted\nError ' + response.status + ": " + response.statusText);
+			});
+		}, function (response) {
+			alert('Can not set connection\nError ' + response.status + ": " + response.statusText);
+		});
 	});
 })()
