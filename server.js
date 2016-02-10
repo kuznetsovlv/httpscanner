@@ -125,7 +125,7 @@
 			let convert = spawn('convert', conv);
 			let fd;
 
-			converter.stdout.on('data', (data) => {
+			convert.stdout.on('data', (data) => {
 				let buffer = new Buffer(data);
 				if (!fd) {
 					try {
@@ -141,7 +141,7 @@
 				}
 			});
 
-			converter.on('close', (code) => {
+			convert.on('close', (code) => {
 				fs.close(fd, (err) => {
 					if (code)
 						self.emit('error', 503, "Stopped with code " + code);
@@ -153,8 +153,8 @@
 			});
 
 			scanner(args, {
-				stdout: (data) => {converter.write(data);},
-				close: () => {converter.stdin.end();},
+				stdout: (data) => {convert.write(data);},
+				close: () => {convert.stdin.end();},
 				stderr: (data) => {this.emit('error', 520, data)}
 			});
 		}
