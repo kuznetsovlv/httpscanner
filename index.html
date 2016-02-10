@@ -21,7 +21,7 @@
 				<p><label for="resolution">Resolution:</label> <select id="resolution" name="resolution" data-ng-model="resolution" data-ng-disabled="!(holded && holded === device.name)" data-ng-options="x + ' dpi' for x in device.fields.resolution"></select></p>
 				<p><label for="format">Image format:</label><select id="format" name="format" data-ng-disabled="!(holded && holded === device.name)" data-ng-model="format" data-ng-options="x for x in formats"></select></p>
 				<p data-ng-show="{jpg: true, jpeg: true, png: true}[format]">
-					<label for="quality">Quality value:</label><span class="range"><input name="quality" type="range" data-ng-disabled="!(holded && holded === device.name)" data-ng-model="quality" data-ng-init="quality=75"><span class="value" data-ng-bind="quality" data-ng-style="{left: 250 * quality / 100 + 'px', top: '20px' }"></span></span>
+					<label for="quality">Quality value:</label><span class="range"><input name="quality" type="range" data-ng-disabled="!(holded && holded === device.name)" data-ng-model="quality" data-ng-init="quality=75"><span class="value" data-ng-bind="quality" data-ng-style="{left: 250 * quality / 100 + 'px', top: '15px' }"></span></span>
 				</p>
 			</fieldset>
 
