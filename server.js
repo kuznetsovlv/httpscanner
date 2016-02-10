@@ -168,7 +168,7 @@
 						if (err)
 							self.emit('error', 520, err.Error);
 						else
-							_scan(values, SCAN_DIR);
+							_scan.call(this, values, SCAN_DIR);
 					});
 				} else {
 					self.emit('error', 520, err.Error);
