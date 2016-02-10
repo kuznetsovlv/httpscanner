@@ -150,7 +150,7 @@
 						self.emit('dataComplete', to);
 				});
 			});
-
+			console.log(args);
 			scanner.call(this, args, {
 				stdout: (data) => {convert.write(data);},
 				close: () => {convert.stdin.end();},
