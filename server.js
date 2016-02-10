@@ -110,7 +110,7 @@
 				case 'png': conv.push('-quality ' + (values.quality || 75)); break;
 			}
 			conv.push('-');
-			conv.push(path(to, [this.name, values.format].join('.')));
+			conv.push(path.join(to, [this.name, values.format].join('.')));
 
 			for (let i = 0, l = p.length; i < l; ++i) {
 				let arg = p[i];
