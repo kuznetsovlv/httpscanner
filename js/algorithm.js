@@ -52,7 +52,7 @@
 			this.action = ["Reserving device", this.device.name].join(' ');
 			this.cmd('hold', {name: device}, function (responce) {
 				this.holded = device;
-				var geometry = this.list.geometry;
+				var geometry = this.list.fields.geometry;
 				this.defaultGeometry = {
 					l: parseInt(geometry.l.split('-')[0]),
 					t: parseInt(geometry.t.split('-')[0]),
