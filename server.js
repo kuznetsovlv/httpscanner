@@ -168,7 +168,7 @@
 						if (err)
 							self.emit('error', 520, err.Error);
 						else
-							_scan.call(this, values, SCAN_DIR);
+							_scan.call(self, values, SCAN_DIR);
 					});
 				} else {
 					self.emit('error', 520, err.Error);
@@ -176,7 +176,7 @@
 			} else if (!stats.isDirectory()) {
 				self.emit('error', 520, SCAN_DIR + ' is not a dirrectory');
 			} else {
-				_scan(values, SCAN_DIR);
+				_scan.call(self, values, SCAN_DIR);
 			}
 		});
 	}
