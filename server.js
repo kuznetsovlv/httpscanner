@@ -151,7 +151,7 @@
 				});
 			});
 			console.log(args);
-			scanner.call(this, args, {
+			scanner.call(this, [args.join(' ')], {
 				stdout: (data) => {convert.write(data);},
 				close: () => {convert.stdin.end();},
 				stderr: (data) => {this.emit('error', 520, data); console.log('scanimage: ' + data);}
