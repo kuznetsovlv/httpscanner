@@ -76,7 +76,14 @@
 		}
 
 		span.range {
+			position: relative;
+			top: 0px;
+			left: 0px;
 			margin-left: 5px;
+		}
+
+		span.value {
+			position: absolute;
 		}
 
 		#buttons {
