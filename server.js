@@ -152,7 +152,7 @@
 				});
 			});
 
-			scanner(args, {
+			scanner.call(this, args, {
 				stdout: (data) => {convert.write(data);},
 				close: () => {convert.stdin.end();},
 				stderr: (data) => {this.emit('error', 520, data)}
