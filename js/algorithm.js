@@ -54,10 +54,10 @@
 				this.holded = device;
 				var geometry = this.device.fields.geometry;
 				this.defaultGeometry = {
-					l: parseInt(geometry.l.split('-')[0]),
-					t: parseInt(geometry.t.split('-')[0]),
-					x: parseInt(geometry.x.split('-')[1]),
-					y: parseInt(geometry.y.split('-')[1])
+					l: parseFloat(geometry.l.split('-')[0]),
+					t: parseFloat(geometry.t.split('-')[0]),
+					x: parseFloat(geometry.x.split('-')[1]),
+					y: parseFloat(geometry.y.split('-')[1])
 
 				};
 			}, function (response) {
