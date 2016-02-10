@@ -120,7 +120,7 @@
 				key.push(arg);
 				args.push(key.join('') + ' ' + values[arg]);
 			}
-
+				console.log(args);
 			let self = this;
 			let convert = spawn('convert', conv);
 			let fd;

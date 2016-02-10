@@ -73,6 +73,7 @@
 			for (var key in this.defaultGeometry)
 				if (!values[key])
 					values[key] = this.defaultGeometry[key];
+			console.log(values);
 			this.action = "Scanning";
 			this.cmd('scan', values, function (response) {
 				console.log(response.data[0]);
