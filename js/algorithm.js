@@ -13,7 +13,7 @@
 			return !(this.holded && this.device && (this.holded === this.device.name) && this.format);
 		}
 
-		$scope.formats = 'jpg,jpeg,gif,bmp,png'.split(',').sort();
+		$scope.formats = 'jpg,gif,bmp,png'.split(',').sort();
 		$scope.cmd = function (cmd, data,/*cmd, data, ...,*/ callback, errHandler) {
 			this.inWait = true;
 			var self = this,
