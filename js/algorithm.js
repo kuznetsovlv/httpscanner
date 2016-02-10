@@ -9,6 +9,10 @@
 			console.log(response.status + ": " + response.statusText);
 		};
 
+		$scope.btnDisable = function () {
+			return !(this.holded && this.device && (this.holded === this.device.name) && this.format);
+		}
+
 		$scope.formats = 'jpg,jpeg,gif,bmp,png'.split(',').sort();
 		$scope.cmd = function (cmd, data,/*cmd, data, ...,*/ callback, errHandler) {
 			this.inWait = true;
@@ -18,6 +22,7 @@
 				var arg = arguments[i];
 				if (typeof arg === 'function') {
 					callback = arg;
+					errHandler = arguments[++i];
 					break;
 				} else if ({'string': 1, 'object': 1}[typeof arg]) {
 					cmds.push(arg);
@@ -34,17 +39,27 @@
 				data: JSON.stringify(cmds)
 			}).then(function (response) {
 				self.inWait = false;
+				delete self.action;
 				callback.call(self, response);
 			}, function (response) {
 				self.inWait = false;
+				delete self.action;
 				(errHandler || this.httpError).call(self, response);
 			});
 		};
 
 		$scope.hold = function (device) {
+			this.action = ["Reserving device", this.device.name].join(' ');
 			this.cmd('hold', {name: device}, function (responce) {
-				console.log(this);
 				this.holded = device;
+				var geometry = this.list.geometry;
+				this.defaultGeometry = {
+					l: parseInt(geometry.l.split('-')[0]),
+					t: parseInt(geometry.t.split('-')[0]),
+					x: parseInt(geometry.x.split('-')[1]),
+					y: parseInt(geometry.y.split('-')[1])
+
+				};
 			}, function (response) {
 				if (response.status == 409){
 					setTimeout(this.hold(device), 2 * 60 * 1000);
@@ -52,6 +67,22 @@
 					alert('Can not hold device ' + device + '\nError ' + response.status + ": " + response.statusText);
 				}
 			});
+		};
+
+		$scope.scan = function (values) {console.log(values);
+			for (var key in this.defaultGeometry)
+				if (!values[key])
+					values[key] = this.defaultGeometry[key];
+			this.action = "Scanning";
+			this.cmd('scan', values, function (response) {
+				console.log(response.data[0]);
+			}, function (response) {
+				alert('Scan process error.\nError ' + response.status + ": " + response.statusText);
+			});
+		};
+
+		$scope.prescan = function () {
+			console.log(this);
 		}
 
 		$http({
@@ -59,9 +90,9 @@
 			url: ''
 		}).then(function (response) {
 			$scope.job = response.data;
+			$scope.action = 'Trying connect to server';
 			$scope.cmd('list', function (response) {
 				this.list = response.data[0];
-				console.log(this);
 			}, function (response) {
 				alert('Connection corrupted\nError ' + response.status + ": " + response.statusText);
 			});

@@ -26,7 +26,7 @@
 			</fieldset>
 
 			<fieldset id="buttons">
-				<input type="submit" value="Scan" name="scan" disabled> <input type="button" value="Prescan" name="prescan" disabled>
+				<input type="submit" value="Scan" name="scan" data-ng-disabled="btnDisable()" data-ng-click="scan({resolution: resolution, format: format, quality: quality})"> <input type="button" value="Prescan" name="prescan" data-ng-disabled="btnDisable()" data-ng-click="prescan()">
 			</fieldset>
 		</form>
 	</div>
