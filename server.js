@@ -120,7 +120,6 @@
 				key.push(arg);
 				args.push(key.join('') + ' ' + values[arg]);
 			}
-				console.log(args);
 			let self = this;
 			let convert = spawn('convert', conv);
 			let fd;
@@ -155,7 +154,7 @@
 			scanner.call(this, args, {
 				stdout: (data) => {convert.write(data);},
 				close: () => {convert.stdin.end();},
-				stderr: (data) => {this.emit('error', 520, data)}
+				stderr: (data) => {this.emit('error', 520, data); console.log('scanimage');}
 			});
 		}
 
