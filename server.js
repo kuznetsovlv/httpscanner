@@ -102,7 +102,7 @@
 	function scan (values) {
 		function _scan (values, to) {
 			let args = ['-d ' + this.device];
-			let p = 'resolution,l,t,x,y'.split(',');
+			let p = 'resolution'.split(',');
 			let conv = [];
 			switch (values.format) {
 				case 'jpg':
@@ -154,7 +154,7 @@
 			scanner.call(this, args, {
 				stdout: (data) => {convert.write(data);},
 				close: () => {convert.stdin.end();},
-				//stderr: (data) => {this.emit('error', 520, data); console.log('scanimage: ' + data);}
+				//stderr: (data) => {this.emit('error', 520, data);}
 			});
 		}
 
