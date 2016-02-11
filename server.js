@@ -84,7 +84,7 @@
 	}
 
 	function holdDevice (name) {
-		let handlers = {
+		/*let handlers = {
 			close: (data) => {
 				if (this.server.busy[name]) {
 					if (!this.server.busy[name].finished && this.server.getJob(this.server.busy[name].name)) {
@@ -103,7 +103,35 @@
 			},
 			stdoutErr: (data) => {this.emit('error', 503, data);}
 		}
-		scanner.call(this, ['-d ' + name, '-L'], handlers);
+		scanner.call(this, ['-d ' + name, '-L'], handlers);*/
+
+		let self = this;
+		exec('scanimage -Ld ' + name, (error, stdout, stderr) => {
+				if (stdout)
+					console.log(`stdout: ${stdout}`);
+				if (stderr) {
+					self.emit('error', 503);
+					console.log(`stderr: ${stderr}`);
+				}
+				if (error)
+					self.emit('error', 409, 'Device ' + name + ' busy.');
+				else {
+					if (self.server.busy[name]) {
+						if (!self.server.busy[name].finished && self.server.getJob(self.server.busy[name].name)) {
+							self.cmds = [];
+							self.emit('error', 409, 'Device ' + name + ' busy.');
+							return;
+						} else {
+							delete server.busy[name];
+						}	
+					}
+					if (!self.finished) {
+						self.server.busy[name] = self;
+						self.device = name;
+						self.emit('dataComplete', name);
+					}
+				}
+			});
 	}
 
 	function scan (values) {
@@ -144,10 +172,9 @@
 				if (stderr)
 					console.log(`stderr: ${stderr}`);
 				if (error)
-					self.sendError(520, "Unknown error:\n" + error.code + ": " + error.Error);
+					self.emit('error', 520, "Unknown error:\n" + error.code + ": " + error.Error);
 				else {
 					self.emit('dataComplete', path.relative(__dirname, file));
-					console.log(path.relative(__dirname, file));
 				}
 
 			});
@@ -239,7 +266,7 @@
 		this.sendError(code, msg);
 	});
 
-	server.jobs.once('finish', function (finalize) {console.log(this.server.busy[this.device]);
+	server.jobs.once('finish', function (finalize) {console.log(this.server.busy[this.device].name);
 		if (this.device) {
 			delete this.server.busy[this.device];
 			delete this.device;
