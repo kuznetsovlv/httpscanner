@@ -8,7 +8,10 @@
 </head>
 <body>
 <div id="page" data-ng-app="scanner" data-ng-controller="scannerCtrl">
-	<div id="left"></div>
+	<div id="left">
+		<div class="canvas" data-ng-style="canvasStyle(this)"> </div>
+	</div>
+
 	<div id="right">
 		<form id="scanner" name="scanform">
 			<fieldset id="device_name">
