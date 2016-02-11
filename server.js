@@ -113,10 +113,12 @@
 
 	function scan (values) {
 		function _scan (values, to) {
+			if (!this.index)
+				this.index = 0;
 			let cmd = ['scanimage', '-d', this.device];
 			let p = 'resolution,l,t,x,y'.split(',');
 			let self = this;
-			let file = path.join(to, [this.name, values.format].join('.'));
+			let file = path.join(to, [[this.name, this.index++].join('_'), values.format].join('.'));
 
 			for (let i = 0, l = p.length; i < l; ++i) {
 				let key = p[i],
@@ -141,7 +143,7 @@
 
 			cmd.push(file);
 
-			exec(cmd.join(' '), (error, stdout, stderr) => {
+			exec(cmd.join(' '), (error, stdout, stderr) => {	
 				if (error)
 					self.emit('error', 520, "Unknown error:\n" + error.code + ": " + error.Error);
 				else {
@@ -233,6 +235,7 @@
 
 	server.jobs.on('error', function (code, msg) {
 		let self = this;
+		this.cmds = [];
 		setTimeout(() => {self.emit('finish');}, WAIT);
 		this.sendError(code, msg);
 	});
@@ -254,7 +257,7 @@
 						else
 							self.finished = true;
 					} else {
-						let r = new RegExp('^' + self.name + '\\.\\w+$');
+						let r = new RegExp('^' + self.name + '_' + '\\d+' + '\\.\\w+$');
 						for (var i = 0, l = files.length; i < l; ++i) {
 							let file = files[i];
 							if (r.test(file))
