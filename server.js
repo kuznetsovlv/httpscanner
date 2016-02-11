@@ -21,7 +21,7 @@
 
 	const server = new scanServer.Server(__dirname, 80);
 
-	const WAIT = 20 * (60 * 1000);
+	const WAIT = 5 * (60 * 1000);
 
 	const SCAN_DIR = path.join(__dirname, 'scans');
 
@@ -84,52 +84,31 @@
 	}
 
 	function holdDevice (name) {
-		/*let handlers = {
-			close: (data) => {
-				if (this.server.busy[name]) {
-					if (!this.server.busy[name].finished && this.server.getJob(this.server.busy[name].name)) {
-						this.cmds = [];
-						this.emit('error', 409, 'Device ' + name + ' busy.');
+		let self = this;
+		exec('scanimage -Ld ' + name, (error, stdout, stderr) => {
+			if (stderr) {
+				self.emit('error', 503);
+				console.log(`stderr: ${stderr}`);
+			}
+			if (error)
+				self.emit('error', 503, '\n' + error.code + ': ' + error.Error);
+			else {
+				if (self.server.busy[name]) {
+					if (!self.server.busy[name].finished && self.server.getJob(self.server.busy[name].name)) {
+						self.cmds = [];
+						self.emit('error', 409, 'Device ' + name + ' busy.');
 						return;
 					} else {
 						delete server.busy[name];
 					}	
 				}
-				if (!this.finished) {
-					this.server.busy[name] = this;
-					this.device = name;
-					this.emit('dataComplete', name);
+				if (!self.finished) {
+					self.server.busy[name] = self;
+					self.device = name;
+					self.emit('dataComplete', name);
 				}
-			},
-			stdoutErr: (data) => {this.emit('error', 503, data);}
-		}
-		scanner.call(this, ['-d ' + name, '-L'], handlers);*/
-
-		let self = this;
-		exec('scanimage -Ld ' + name, (error, stdout, stderr) => {
-				if (stderr) {
-					self.emit('error', 503);
-					console.log(`stderr: ${stderr}`);
-				}
-				if (error)
-					self.emit('error', 503, '\n' + error.code + ': ' + error.Error);
-				else {
-					if (self.server.busy[name]) {console.log(self.server.busy[name].name);
-						if (!self.server.busy[name].finished && self.server.getJob(self.server.busy[name].name)) {
-							self.cmds = [];
-							self.emit('error', 409, 'Device ' + name + ' busy.');
-							return;
-						} else {
-							delete server.busy[name];
-						}	
-					}
-					if (!self.finished) {
-						self.server.busy[name] = self;
-						self.device = name;
-						self.emit('dataComplete', name);
-					}
-				}
-			});
+			}
+		});
 	}
 
 	function scan (values) {
