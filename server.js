@@ -140,63 +140,12 @@
 					console.log(`stderr: ${stderr}`);
 				if (error)
 					self.sendError(520, "Unknown error:\n" + error.code + ": " + error.Error);
-				else
-					self.emit('dataComplete', file);
-			});
-			/*let args = ['-d ' + this.device];
-			let p = 'resolution'.split(',');
-			let conv = [];
-			switch (values.format) {
-				case 'jpg':
-				case 'jpeg':
-				case 'png': conv.push('-quality ' + (values.quality || 75)); break;
-			}
-			conv.push('-');
-			conv.push(path.join(to, [this.name, values.format].join('.')));
-
-			for (let i = 0, l = p.length; i < l; ++i) {
-				let arg = p[i];
-				let key = ['-'];
-				if (arg.length > 1)
-					key.push('-');
-				key.push(arg);
-				args.push(key.join('') + ' ' + values[arg]);
-			}
-			let self = this;
-			let convert = spawn('convert', conv);
-			let fd;
-
-			convert.stdout.on('data', (data) => {
-				let buffer = new Buffer(data);
-				if (!fd) {
-					try {
-						fd = fs.openSync(to, 'w');
-					} catch (err) {
-						self.emit('error', 520, err.Error);
-					}
+				else {
+					self.emit('dataComplete', path.relative(__dirname, file));
+					console.log(path.relative(__dirname, file));
 				}
-				try {
-					fs.writeSync(fd, buffer, 0, buffer.length);
-				} catch (err) {
-					self.emit('error', 520, err.Error);
-				}
-			});
 
-			convert.on('close', (code) => {
-				fs.close(fd, (err) => {
-					if (code)
-						self.emit('error', 503, "Stopped with code " + code);
-					else if (err)
-						self.sendError(520, err.Error);
-					else
-						self.emit('dataComplete', to);
-				});
 			});
-			console.log(args);
-			scanner.call(this, args, {
-				stdout: (data) => {convert.write(data);},
-				close: () => {convert.stdin.end();},
-			});*/
 		}
 
 		let self = this;
