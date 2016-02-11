@@ -106,8 +106,17 @@
 			});
 		};
 
-		$scope.prescan = function () {
-			console.log(this);
+		$scope.prescan = function (format) {
+			var values = {
+				resolution: this.device.fields.resolution[0],
+				format: format,
+				quality: 50
+			};
+
+			for (var key in this.defaultGeometry)
+				values[key] = this.defaultGeometry[key];
+
+			this.scan(values);
 		}
 
 		window.onunload = function () {
