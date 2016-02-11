@@ -26,10 +26,12 @@
 
 			if (this.defaultGeometry) {
 					var pWidth = parent.clientWidth,
-				    pHeight = parent.clientHeight,
-				    w = this.defaultGeometry.x - this.defaultGeometry.l,
-				    h = this.defaultGeometry.y - this.defaultGeometry.t;
-				    console.log(pWidth);
+					    pHeight = parent.clientHeight,
+					    w = this.defaultGeometry.x - this.defaultGeometry.l,
+					    h = this.defaultGeometry.y - this.defaultGeometry.t,
+					    k = Math.min(pWidth / w, pHeight / h);
+					    styleObj.width = [w * k, 'px'].join('');
+					    styleObj.height = [h * k, 'px'].join('');
 			}
 
 			return 	styleObj;		
