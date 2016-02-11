@@ -286,7 +286,7 @@
 				} else {
 					throw err.code + ": " + err.Error;
 				}
-			} else if (!stats.isDirectory()) {
+			} else if (stats.isDirectory()) {
 				fs.rmdir(SCAN_DIR, (err) => {
 					if (err)
 						throw err.code + ": " + err.Error;
