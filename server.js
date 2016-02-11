@@ -287,14 +287,14 @@
 					throw err.code + ": " + err.Error;
 				}
 			} else if (!stats.isDirectory()) {
-				fs.rmdir(SCAN_DIR, (err) {
+				fs.rmdir(SCAN_DIR, (err) => {
 					if (err)
 						throw err.code + ": " + err.Error;
 					else
 						server.up();
 				});
 			} else {
-				fs.unlink(SCAN_DIR, (err) {
+				fs.unlink(SCAN_DIR, (err) => {
 					if (err)
 						throw err.code + ": " + err.Error;
 					else
