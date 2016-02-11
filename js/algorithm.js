@@ -28,7 +28,7 @@
 					var pWidth = parent.clientWidth,
 				    pHeight = parent.clientHeight,
 				    w = this.defaultGeometry.x - this.defaultGeometry.l,
-				    h = thi.defaultGeometry.y - this.defaultGeometry.t;
+				    h = this.defaultGeometry.y - this.defaultGeometry.t;
 				    console.log(pWidth);
 			}
 
