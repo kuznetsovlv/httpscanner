@@ -86,15 +86,14 @@
 	function holdDevice (name) {
 		let handlers = {
 			close: (data) => {
-				if (server.busy[name]) {
-					if (!server.busy[name].finished) {
+				if (this.server.busy[name]) {
+					if (!this.server.busy[name].finished && this.server.getJob(this.server.busy[name].name)) {
 						this.cmds = [];
 						this.emit('error', 409, 'Device ' + name + ' busy.');
 						return;
 					} else {
 						delete server.busy[name];
-					}
-					
+					}	
 				}
 				if (!this.finished) {
 					this.server.busy[name] = this;
