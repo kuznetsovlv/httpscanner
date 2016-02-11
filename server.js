@@ -234,7 +234,7 @@
 		this.sendError(code, msg);
 	});
 
-	server.jobs.once('finish', function (finalize) {
+	server.jobs.once('finish', function (finalize) {console.log(this.server.busy[this.device]);
 		if (this.device) {
 			delete this.server.busy[this.device];
 			delete this.device;
