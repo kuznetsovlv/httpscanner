@@ -142,10 +142,6 @@
 			cmd.push(file);
 
 			exec(cmd.join(' '), (error, stdout, stderr) => {
-				if (stdout)
-					console.log(`stdout: ${stdout}`);
-				if (stderr)
-					console.log(`stderr: ${stderr}`);
 				if (error)
 					self.emit('error', 520, "Unknown error:\n" + error.code + ": " + error.Error);
 				else {
