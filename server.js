@@ -87,14 +87,20 @@
 		let handlers = {
 			close: (data) => {
 				if (server.busy[name]) {
-					this.cmds = [];
-					this.emit('error', 409, 'Device ' + name + ' busy.');
-					return;
+					if (!server.busy[name].finished) {
+						this.cmds = [];
+						this.emit('error', 409, 'Device ' + name + ' busy.');
+						return;
+					} else {
+						delete server.busy[name];
+					}
+					
 				}
-	
-				this.server.busy[name] = this.name;
-				this.device = name;
-				this.emit('dataComplete', name);
+				if (!this.finished) {
+					this.server.busy[name] = this;
+					this.device = name;
+					this.emit('dataComplete', name);
+				}
 			},
 			stdoutErr: (data) => {this.emit('error', 503, data);}
 		}
