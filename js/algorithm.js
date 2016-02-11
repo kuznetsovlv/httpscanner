@@ -13,7 +13,7 @@
 		$scope.pic = null;
 
 		$scope.inpDisable = function () {
-			return !(this.holded && this.device && (this.holded === this.device.name));
+			return this.inWait || !(this.holded && this.device && (this.holded === this.device.name));
 		}
 
 		$scope.scanDisable = function () {
