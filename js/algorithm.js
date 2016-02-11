@@ -9,11 +9,17 @@
 			console.log(response.status + ": " + response.statusText);
 		};
 
+		$scope.formats = 'jpg,gif,bmp,png,jpeg'.split(',').sort();
+		$scope.pic = null;
+
 		$scope.btnDisable = function () {
 			return !(this.holded && this.device && (this.holded === this.device.name) && this.format);
 		}
 
-		$scope.formats = 'jpg,gif,bmp,png'.split(',').sort();
+		$scope.canvasStyle = function () {
+			console.log(this, arguments);
+		}
+
 		$scope.cmd = function (cmd, data,/*cmd, data, ...,*/ callback, errHandler) {
 			this.inWait = true;
 			var self = this,
@@ -69,14 +75,14 @@
 			});
 		};
 
-		$scope.scan = function (values) {console.log(values);
+		$scope.scan = function (values) {
 			for (var key in this.defaultGeometry)
 				if (!values[key])
 					values[key] = this.defaultGeometry[key];
-			console.log(values);
 			this.action = "Scanning";
 			this.cmd('scan', values, function (response) {
 				console.log(response.data[0]);
+				this.pic = response.data[0];
 			}, function (response) {
 				alert('Scan process error.\nError ' + response.status + ": " + response.statusText);
 			});
