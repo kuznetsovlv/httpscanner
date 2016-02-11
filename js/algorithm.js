@@ -12,8 +12,8 @@
 		$scope.formats = 'jpg,gif,bmp,png,jpeg'.split(',').sort();
 		$scope.pic = null;
 
-		$scope.btnDisable = function () {
-			return !(this.holded && this.device && (this.holded === this.device.name) && this.format);
+		$scope.inpDisable = function () {
+			return !(this.holded && this.device && (this.holded === this.device.name));
 		}
 
 		$scope.canvasStyle = function (parent) {
@@ -99,17 +99,16 @@
 					values[key] = this.defaultGeometry[key];
 			this.action = "Scanning";
 			this.cmd('scan', values, function (response) {
-				console.log(response.data[0]);
 				this.pic = response.data[0];
 			}, function (response) {
 				alert('Scan process error.\nError ' + response.status + ": " + response.statusText);
 			});
 		};
 
-		$scope.prescan = function (format) {
+		$scope.prescan = function () {
 			var values = {
 				resolution: this.device.fields.resolution[0],
-				format: format,
+				format: this.formats[0],
 				quality: 50
 			};
 

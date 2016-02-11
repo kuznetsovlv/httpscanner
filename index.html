@@ -23,15 +23,15 @@
 
 			<fieldset id="image_property">
 				<legend>Image property:</legend>
-				<p><label for="resolution">Resolution:</label> <select id="resolution" name="resolution" data-ng-model="resolution" data-ng-disabled="!(holded && holded === device.name)" data-ng-options="x + ' dpi' for x in device.fields.resolution"></select></p>
-				<p><label for="format">Image format:</label><select id="format" name="format" data-ng-disabled="!(holded && holded === device.name)" data-ng-model="format" data-ng-options="x for x in formats"></select></p>
+				<p><label for="resolution">Resolution:</label> <select id="resolution" name="resolution" data-ng-model="resolution" data-ng-disabled="inpDisable()" data-ng-options="x + ' dpi' for x in device.fields.resolution"></select></p>
+				<p><label for="format">Image format:</label><select id="format" name="format" data-ng-disabled="inpDisable()" data-ng-model="format" data-ng-options="x for x in formats"></select></p>
 				<p data-ng-show="{jpg: true, jpeg: true, png: true}[format]">
-					<label for="quality">Quality value:</label><span class="range"><input name="quality" type="range" data-ng-disabled="!(holded && holded === device.name)" data-ng-model="quality" data-ng-init="quality=75"><span class="value" data-ng-bind="quality" data-ng-style="{left: 250 * quality / 100 + 'px', top: '15px' }"></span></span>
+					<label for="quality">Quality value:</label><span class="range"><input name="quality" type="range" data-ng-disabled="inpDisable()" data-ng-model="quality" data-ng-init="quality=75"><span class="value" data-ng-bind="quality" data-ng-style="{left: 250 * quality / 100 + 'px', top: '15px' }"></span></span>
 				</p>
 			</fieldset>
 
 			<fieldset id="buttons">
-				<input type="submit" value="Scan" name="scan" data-ng-disabled="btnDisable()" data-ng-click="scan({resolution: resolution, format: format, quality: quality})"> <input type="button" value="Prescan" name="prescan" data-ng-disabled="btnDisable()" data-ng-click="prescan(format)">
+				<input type="submit" value="Scan" name="scan" data-ng-disabled="inpDisable() && format && resolution" data-ng-click="scan({resolution: resolution, format: format, quality: quality})"> <input type="button" value="Prescan" name="prescan" data-ng-disabled="inpDisable()" data-ng-click="prescan(format)">
 			</fieldset>
 		</form>
 	</div>
