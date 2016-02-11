@@ -62,7 +62,7 @@
 				};
 			}, function (response) {
 				if (response.status == 409){
-					setTimeout(this.hold(device), 2 * 60 * 1000);
+					setTimeout(function () {$scope.hold(device)}, 2 * 60 * 1000);
 				} else {
 					alert('Can not hold device ' + device + '\nError ' + response.status + ": " + response.statusText);
 				}
