@@ -255,7 +255,7 @@
 						for (var i = 0, l = files.length; i < l; ++i) {
 							let file = files[i];
 							if (r.test(file))
-								fs.unlinkSynk(path.join(SCAN_DIR, file));
+								fs.unlinkSync(path.join(SCAN_DIR, file));
 						}
 						if (finalize)
 							self.clear(200);
