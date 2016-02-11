@@ -114,7 +114,7 @@
 				if (key.length > 1)
 					arg.push('-');
 				arg.push(key);
-				cmd.push(arg, values[key]);
+				cmd.push(arg.join(''), values[key]);
 			}
 
 			cmd.push('|');
