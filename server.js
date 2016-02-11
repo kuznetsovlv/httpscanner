@@ -82,11 +82,12 @@
 		}
 		scanner.call(this, ['-f %i\t%d\t%v\t%m\t%n'], handlers);*/
 		let self = this;
-		exec('scanimage -f %i\\t%d\\t%v\\t%m\\t%n', (error, stdout, stderr) => {
+		exec('scanimage -f %i\t%d\\t%v\t%m\t%n', (error, stdout, stderr) => {
 			if (error) {
 				self.emit('error', 503, '\n' + error.code + ': ' + error.Error);
 			} else {
 				console.log(`stdout: ${stdout}`);
+				console.log(stdout);
 			}
 		});
 	}
