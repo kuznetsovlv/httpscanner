@@ -31,7 +31,7 @@
 			</fieldset>
 
 			<fieldset id="buttons">
-				<input type="submit" value="Scan" name="scan" data-ng-disabled="inpDisable() && format && resolution" data-ng-click="scan({resolution: resolution, format: format, quality: quality})"> <input type="button" value="Prescan" name="prescan" data-ng-disabled="inpDisable()" data-ng-click="prescan()">
+				<input type="submit" value="Scan" name="scan" data-ng-disabled="inpDisable() || !format || !resolution" data-ng-click="scan({resolution: resolution, format: format, quality: quality})"> <input type="button" value="Prescan" name="prescan" data-ng-disabled="inpDisable()" data-ng-click="prescan()">
 			</fieldset>
 		</form>
 	</div>
