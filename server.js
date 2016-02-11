@@ -141,8 +141,6 @@
 
 			cmd.push(file);
 
-			console.log(cmd.join(' '));
-
 			exec(cmd.join(' '), (error, stdout, stderr) => {
 				if (stdout)
 					console.log(`stdout: ${stdout}`);
@@ -243,7 +241,7 @@
 		this.sendError(code, msg);
 	});
 
-	server.jobs.once('finish', function (finalize) {console.log(this.server.busy[this.device].name);
+	server.jobs.once('finish', function (finalize) {
 		if (this.device) {
 			delete this.server.busy[this.device];
 			delete this.device;
@@ -251,7 +249,7 @@
 		this.cmds = [];
 
 		let self = this;
-		fs.stat(SCAN_DIR, (err, stats) => {console.log('close');
+		fs.stat(SCAN_DIR, (err, stats) => {
 			if (!err && stats.isDirectory()) {
 				fs.readdir(SCAN_DIR, (err, files) => {
 					if(err) {
