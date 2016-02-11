@@ -7,7 +7,11 @@
 
 	const path = require('path');
 
-	const spawn = require('child_process').spawn;
+	const child_process = require('child_process');
+
+	const spawn = child_process.spawn;
+
+	const exec = child_process.exec;
 
 	const scanServer = require('scanserver');
 
@@ -75,7 +79,6 @@
 				this.emit('dataComplete', list);
 			},
 			stdoutErr: (data) => {console.log(data); this.emit('error', 503, data)},
-			stderr: (data) => {this.emit('error', 520, data)}
 		}
 		scanner.call(this, ['-f %i\t%d\t%v\t%m\t%n'], handlers);
 	}
@@ -93,15 +96,54 @@
 				this.device = name;
 				this.emit('dataComplete', name);
 			},
-			stdoutErr: (data) => {this.emit('error', 503, data);},
-			stderr: (data) => {this.emit('error', 520, data);}
+			stdoutErr: (data) => {this.emit('error', 503, data);}
 		}
 		scanner.call(this, ['-d ' + name, '-L'], handlers);
 	}
 
 	function scan (values) {
 		function _scan (values, to) {
-			let args = ['-d ' + this.device];
+			let cmd = ['scanimage', '-d', this.device];
+			let p = 'resolution,l,t,x,y'.split(',');
+			let self = this;
+			let file = path.join(to, [this.name, values.format].join('.'));
+
+			for (let i = 0, l = p.length; i < l; ++i) {
+				let key = p[i],
+				    arg = ['-'];
+				if (key.length > 1)
+					arg.push('-');
+				arg.push(key);
+				cmd.push(arg, values[key]);
+			}
+
+			cmd.push('|');
+
+			cmd.push('convert');
+
+			switch (values.format) {
+				case 'jpg':
+				case 'jpeg':
+				case 'png': cmd.push('-quality ' + (values.quality || 75)); break;
+			}
+
+			cmd.push('-');
+
+			cmd.push(file);
+
+			console.log(cmd.join(' '));
+
+			exec(cmd.join(' '), (error, stdout, stderr) => {
+				if (stdout)
+					console.log(`stdout: ${stdout}`);
+				if (stderr)
+					console.log(`stderr: ${stderr}`);
+				if (error)
+					self.sendError(520, "Unknown error:\n" + error.code + ": " + error.Error);
+				else
+					self.emit('dataComplete', file);
+			});
+			/*let args = ['-d ' + this.device];
 			let p = 'resolution'.split(',');
 			let conv = [];
 			switch (values.format) {
@@ -154,8 +196,7 @@
 			scanner.call(this, args, {
 				stdout: (data) => {convert.write(data);},
 				close: () => {convert.stdin.end();},
-				//stderr: (data) => {this.emit('error', 520, data);}
-			});
+			});*/
 		}
 
 		let self = this;
