@@ -279,6 +279,30 @@
 		});
 	});
 
-	server.up();
+	fs.stat(SCAN_DIR, (err, stats) => {
+			if (err) {
+				if (err.code === 'ENOENT') {
+					server.up();
+				} else {
+					throw err.code + ": " + err.Error;
+				}
+			} else if (!stats.isDirectory()) {
+				fs.rmdir(SCAN_DIR, (err) {
+					if (err)
+						throw err.code + ": " + err.Error;
+					else
+						server.up();
+				});
+			} else {
+				fs.unlink(SCAN_DIR, (err) {
+					if (err)
+						throw err.code + ": " + err.Error;
+					else
+						server.up();
+				});
+			}
+		});
+
+	
 
 })()
