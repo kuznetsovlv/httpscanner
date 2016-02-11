@@ -3,7 +3,7 @@
 		{
 			"type": "Epson L210/L350/L351 Series",
 			"fields": {
-				"resolution": ["75", "150", "300", "600"],
+				"resolution": ["75", "150", "300"],
 				"geometry": {
 					"l": "0-215.9",
 					"t": "0-297.18",
