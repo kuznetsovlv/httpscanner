@@ -86,6 +86,10 @@
 			console.log(this);
 		}
 
+		window.onunload = function () {
+			$scope.cmd('close', function () {});
+		};
+
 		$http({
 			method: 'POST',
 			url: ''

@@ -242,7 +242,7 @@
 		this.cmds = [];
 
 		let self = this;
-		fs.stat(SCAN_DIR, (err, stats) => {
+		fs.stat(SCAN_DIR, (err, stats) => {console.log('close');
 			if (!err && stats.isDirectory()) {
 				fs.readdir(SCAN_DIR, (err, files) => {
 					if(err) {
