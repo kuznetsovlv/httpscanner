@@ -92,7 +92,7 @@
 					return;
 				}
 	
-				server.busy[name] = this.name;
+				this.server.busy[name] = this.name;
 				this.device = name;
 				this.emit('dataComplete', name);
 			},
@@ -236,7 +236,7 @@
 
 	server.jobs.once('finish', function (finalize) {
 		if (this.device) {
-			delete server.busy[this.device];
+			delete this.server.busy[this.device];
 			delete this.device;
 		}
 		this.cmds = [];
