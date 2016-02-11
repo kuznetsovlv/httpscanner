@@ -109,7 +109,7 @@
 			var values = {
 				resolution: this.device.fields.resolution[0],
 				format: this.formats[0],
-				quality: 50
+				quality: 25
 			};
 
 			for (var key in this.defaultGeometry)
