@@ -16,7 +16,7 @@
 			return !(this.holded && this.device && (this.holded === this.device.name));
 		}
 
-		$scope.scanDisable () {
+		$scope.scanDisable = function () {
 			return this.inpDisable() || !this.format || ! this.resolution;
 		}
 
