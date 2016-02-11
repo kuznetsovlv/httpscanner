@@ -224,6 +224,7 @@
 			let self = this;
 			setTimeout(() => {self.emit('finish');}, WAIT);
 			this.sendData(JSON.stringify(this.answers), 'json');
+			delete this.answers;
 		}
 	});
 
