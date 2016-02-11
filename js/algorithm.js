@@ -17,7 +17,7 @@
 		}
 
 		$scope.scanDisable = function () {
-			return this.inpDisable() || !this.format || ! this.resolution;
+			return this.inpDisable() || !this.format || !this.resolution;
 		}
 
 		$scope.canvasStyle = function (parent) {
