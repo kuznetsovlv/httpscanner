@@ -22,7 +22,7 @@
 			var styleObj = {
 				border: '1px solid black',
 				'background-color': 'white',
-				marging: 'auto'
+				margin: 'auto'
 			};
 
 			if (this.defaultGeometry) {
