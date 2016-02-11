@@ -16,8 +16,23 @@
 			return !(this.holded && this.device && (this.holded === this.device.name) && this.format);
 		}
 
-		$scope.canvasStyle = function () {
-			console.log(this, arguments);
+		$scope.canvasStyle = function (parent) {
+			parent = document.getElementById(parent);
+
+			var styleObj = {
+				border: '1px solid black',
+				background-color: 'white'
+			}
+
+			if (this.defaultGeometry) {
+					var pWidth = parent.clientWidth,
+				    pHeight = parent.clientHeight,
+				    w = this.defaultGeometry.x - this.defaultGeometry.l,
+				    h = thi.defaultGeometry.y - this.defaultGeometry.t;
+				    console.log(pWidth);
+			}
+
+			return 	styleObj;		
 		}
 
 		$scope.cmd = function (cmd, data,/*cmd, data, ...,*/ callback, errHandler) {
