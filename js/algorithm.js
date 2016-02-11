@@ -16,6 +16,10 @@
 			return !(this.holded && this.device && (this.holded === this.device.name));
 		}
 
+		$scope.scanDisable () {
+			return this.inpDisable() || !this.format || ! this.resolution;
+		}
+
 		$scope.canvasStyle = function (parent) {
 			parent = document.getElementById(parent);
 
