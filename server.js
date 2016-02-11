@@ -279,7 +279,7 @@
 		});
 	});
 
-	fs.stat(SCAN_DIR, (err, stats) => {
+	/*fs.stat(SCAN_DIR, (err, stats) => {
 			if (err) {
 				if (err.code === 'ENOENT') {
 					server.up();
@@ -301,8 +301,8 @@
 						server.up();
 				});
 			}
-		});
+		});*/
 
-	
+	server.up();
 
 })()
