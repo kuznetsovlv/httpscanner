@@ -116,7 +116,7 @@
 				if (error)
 					self.emit('error', 503, '\n' + error.code + ': ' + error.Error);
 				else {
-					if (self.server.busy[name]) {console.log(!self.server.busy[name].finished && self.server.getJob(self.server.busy[name].name);
+					if (self.server.busy[name]) {console.log(!self.server.busy[name].finished && self.server.getJob(self.server.busy[name].name));
 						if (!self.server.busy[name].finished && self.server.getJob(self.server.busy[name].name)) {
 							self.cmds = [];
 							self.emit('error', 409, 'Device ' + name + ' busy.');
