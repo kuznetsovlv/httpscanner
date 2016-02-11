@@ -21,7 +21,8 @@
 
 			var styleObj = {
 				border: '1px solid black',
-				'background-color': 'white'
+				'background-color': 'white',
+				marging: 'auto'
 			};
 
 			if (this.defaultGeometry) {
