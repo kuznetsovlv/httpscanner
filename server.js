@@ -86,7 +86,7 @@
 			if (error) {
 				self.emit('error', 503, '\n' + error.code + ': ' + error.Error);
 			} else {
-				console.log(stdout.toString('utf8'));
+				console.log(stdout.toString());
 			}
 		});
 	}
